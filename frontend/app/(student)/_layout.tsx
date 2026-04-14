@@ -64,7 +64,7 @@ export default function StudentTabLayout() {
           title: 'Search',
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
@@ -76,7 +76,7 @@ export default function StudentTabLayout() {
           title: 'My Books',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
@@ -85,13 +85,7 @@ export default function StudentTabLayout() {
       <Tabs.Screen
         name="exchange"
         options={{
-          title: 'Exchange',
-          tabBarIcon: ({ color }) => <TabBarIcon name="exchange" color={color} />,
-          headerLeft: () => (
-            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 15 }}>
-              <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
-            </Pressable>
-          ),
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -100,7 +94,7 @@ export default function StudentTabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(student)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),

@@ -25,10 +25,10 @@ export default function StudentHomeDashboard() {
   const greeting = hour < 12 ? 'GOOD MORNING ☀️' : hour < 18 ? 'GOOD AFTERNOON 🌤️' : 'GOOD EVENING 🌙';
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={styles.scrollContent}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
 
       {/* Header Section */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
         <View style={styles.greetingWrapper}>
           <Text style={[styles.greetingSub, { color: colors.textSecondary }]}>{greeting}</Text>
           <Text style={[styles.greetingMain, { color: colors.text }]}>Hello, {user?.name?.split(' ')[0] || 'User'}!</Text>
@@ -40,14 +40,16 @@ export default function StudentHomeDashboard() {
           style={[styles.bellContainer, { backgroundColor: colors.surface }]}
           onPress={() => setShowNotifications(true)}
         >
-          <FontAwesome name="bell" size={20} color="#FBBF24" />
+          <FontAwesome name="bell" size={20} color={colors.primary} />
           <View style={styles.badge}><Text style={styles.badgeText}>3</Text></View>
         </Pressable>
       </View>
 
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+
       {/* Main Banner Card */}
       <LinearGradient
-        colors={['#2563EB', '#1E40AF']}
+        colors={[colors.primaryLight, colors.primary]}
         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
         style={styles.bannerCard}
       >
@@ -60,72 +62,60 @@ export default function StudentHomeDashboard() {
       {/* Statistics Row */}
       <View style={styles.statsRow}>
         <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: '#2563EB' }]}>2</Text>
+          <Text style={[styles.statNumber, { color: colors.primary }]}>2</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>BORROWED</Text>
         </View>
         <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: '#10B981' }]}>248</Text>
+          <Text style={[styles.statNumber, { color: colors.secondary }]}>248</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>AVAILABLE</Text>
         </View>
         <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: '#EF4444' }]}>1</Text>
+          <Text style={[styles.statNumber, { color: colors.error }]}>1</Text>
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>DUE SOON</Text>
         </View>
       </View>
 
-      {/* Quick Actions Title & Indicator */}
+      {/* Quick Actions Title */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>QUICK ACTIONS</Text>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
-          <Text style={{ fontSize: 12, color: colors.textSecondary, marginRight: 6 }}>Swipe</Text>
-          <FontAwesome name="arrow-right" size={12} color={colors.textSecondary} />
-        </View>
       </View>
 
       {/* Quick Actions Grid */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.grid}>
+      <View style={styles.grid}>
         <Pressable
           style={[styles.gridItem, { backgroundColor: colors.surface }]}
           onPress={() => router.push('/(student)/search')}
         >
-          <View style={[styles.iconWrapper, { backgroundColor: '#EFF6FF' }]}>
-            <FontAwesome name="search" size={22} color="#3B82F6" />
+          <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(124, 58, 237, 0.15)' : '#F3E8FF' }]}>
+            <FontAwesome name="search" size={22} color={colors.primary} />
           </View>
           <Text style={[styles.gridTitle, { color: colors.text }]}>Search Books</Text>
+          <Text style={[styles.gridSub, { color: colors.textSecondary }]}>Find & reserve</Text>
         </Pressable>
 
         <Pressable
           style={[styles.gridItem, { backgroundColor: colors.surface }]}
           onPress={() => router.push('/(student)/loan')}
         >
-          <View style={[styles.iconWrapper, { backgroundColor: '#FEF2F2' }]}>
-            <FontAwesome name="book" size={22} color="#EF4444" />
+          <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
+            <FontAwesome name="book" size={22} color={colors.secondary} />
           </View>
           <Text style={[styles.gridTitle, { color: colors.text }]}>My Books</Text>
+          <Text style={[styles.gridSub, { color: colors.textSecondary }]}>Active loans</Text>
         </Pressable>
-
-        <Pressable
-          style={[styles.gridItem, { backgroundColor: colors.surface }]}
-          onPress={() => router.push('/(student)/exchange')}
-        >
-          <View style={[styles.iconWrapper, { backgroundColor: '#FFFBEB' }]}>
-            <FontAwesome name="handshake-o" size={22} color="#F59E0B" />
-          </View>
-          <Text style={[styles.gridTitle, { color: colors.text }]}>Exchange</Text>
-        </Pressable>
-      </ScrollView>
+      </View>
 
       {/* Recently Added Section */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>RECENTLY ADDED</Text>
-        <Pressable><Text style={{ color: '#2563EB', fontWeight: 'bold' }}>See all</Text></Pressable>
+        <Pressable><Text style={{ color: colors.primary, fontWeight: 'bold' }}>See all</Text></Pressable>
       </View>
 
       <View style={styles.recentList}>
         {RECENT_BOOKS.map(book => (
           <View key={book.id} style={[styles.bookCard, { backgroundColor: colors.surface }]}>
             <View style={[styles.bookIconProxy, { backgroundColor: colors.background }]}>
-              <FontAwesome name="book" size={24} color={book.available ? '#10B981' : '#F59E0B'} />
+              <FontAwesome name="book" size={24} color={book.available ? colors.secondary : colors.primaryLight} />
             </View>
             <View style={styles.bookDetails}>
               <Text style={[styles.bookTitle, { color: colors.text }]}>{book.title}</Text>
@@ -134,14 +124,14 @@ export default function StudentHomeDashboard() {
               </Text>
               <View style={styles.badgeRow}>
                 {book.available ? (
-                  <View style={[styles.availabilityBadge, { backgroundColor: '#ECFDF5' }]}>
-                    <FontAwesome name="check" size={10} color="#10B981" style={{ marginRight: 4 }} />
-                    <Text style={[styles.availabilityText, { color: '#10B981' }]}>Available</Text>
+                  <View style={[styles.availabilityBadge, { backgroundColor: colorScheme === 'dark' ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
+                    <FontAwesome name="check" size={10} color={colors.secondary} style={{ marginRight: 4 }} />
+                    <Text style={[styles.availabilityText, { color: colors.secondary }]}>Available</Text>
                   </View>
                 ) : (
-                  <View style={[styles.availabilityBadge, { backgroundColor: '#FFFBEB' }]}>
-                    <FontAwesome name="clock-o" size={10} color="#F59E0B" style={{ marginRight: 4 }} />
-                    <Text style={[styles.availabilityText, { color: '#F59E0B' }]}>Checked Out</Text>
+                  <View style={[styles.availabilityBadge, { backgroundColor: colorScheme === 'dark' ? 'rgba(217, 70, 239, 0.15)' : '#FAE8FF' }]}>
+                    <FontAwesome name="clock-o" size={10} color={colors.primaryLight} style={{ marginRight: 4 }} />
+                    <Text style={[styles.availabilityText, { color: colors.primaryLight }]}>Checked Out</Text>
                   </View>
                 )}
                 {book.copies > 0 && (
@@ -156,22 +146,26 @@ export default function StudentHomeDashboard() {
       </View>
 
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: {
-    padding: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingHorizontal: 24,
+    paddingTop: 8,
     paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    paddingHorizontal: 24,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 16,
+    zIndex: 10,
   },
   greetingWrapper: { flex: 1 },
   greetingSub: { fontSize: 12, fontWeight: 'bold', letterSpacing: 1, marginBottom: 4 },
@@ -232,10 +226,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginBottom: 32,
+    justifyContent: 'space-between',
   },
   gridItem: {
-    width: 130,
-    padding: 12,
+    flex: 1,
+    padding: 16,
     borderRadius: 16,
     alignItems: 'center',
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
@@ -247,8 +242,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
     marginBottom: 8,
   },
-  gridTitle: { fontSize: 13, fontWeight: 'bold', marginBottom: 2, textAlign: 'center' },
-  gridSub: { display: 'none' },
+  gridTitle: { fontSize: 14, fontWeight: 'bold', marginBottom: 4, textAlign: 'center' },
+  gridSub: { fontSize: 11, textAlign: 'center' },
   recentList: {
     gap: 12,
   },

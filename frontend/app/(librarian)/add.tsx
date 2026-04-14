@@ -11,7 +11,7 @@ const MOCK_BOOKS = [
 ];
 
 export default function BooksScreen() {
-  const [activeTab, setActiveTab] = useState<'search' | 'add'>('search');
+  const [activeTab, setActiveTab] = useState<'search' | 'add'>('add');
   
   // Add Form State
   const [itemType, setItemType] = useState<'book' | 'paper'>('book');
@@ -19,6 +19,7 @@ export default function BooksScreen() {
   const [author, setAuthor] = useState('');
   const [shelf, setShelf] = useState('');
   const [copies, setCopies] = useState('');
+  const [description, setDescription] = useState('');
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,7 +29,7 @@ export default function BooksScreen() {
 
   const handleAdd = () => {
     alert(`${itemType === 'book' ? 'Book' : 'Paper'} "${title}" added!`);
-    setTitle(''); setAuthor(''); setShelf(''); setCopies('');
+    setTitle(''); setAuthor(''); setShelf(''); setCopies(''); setDescription('');
     setActiveTab('search');
   };
 
@@ -43,21 +44,19 @@ export default function BooksScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.text }]}>Books Management</Text>
-        
         {/* Toggle Buttons */}
         <View style={styles.toggleContainer}>
-          <Pressable 
-            style={[styles.toggleBtn, activeTab === 'search' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-            onPress={() => setActiveTab('search')}
-          >
-            <Text style={[styles.toggleText, { color: activeTab === 'search' ? '#FFF' : colors.textSecondary }]}>Search</Text>
-          </Pressable>
           <Pressable 
             style={[styles.toggleBtn, activeTab === 'add' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setActiveTab('add')}
           >
             <Text style={[styles.toggleText, { color: activeTab === 'add' ? '#FFF' : colors.textSecondary }]}>Add New</Text>
+          </Pressable>
+          <Pressable 
+            style={[styles.toggleBtn, activeTab === 'search' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+            onPress={() => setActiveTab('search')}
+          >
+            <Text style={[styles.toggleText, { color: activeTab === 'search' ? '#FFF' : colors.textSecondary }]}>Search</Text>
           </Pressable>
         </View>
       </View>
@@ -97,6 +96,17 @@ export default function BooksScreen() {
               placeholderTextColor={colors.textSecondary}
               value={author}
               onChangeText={setAuthor}
+            />
+
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Description</Text>
+            <TextInput
+              style={[styles.input, { borderColor: colors.border, color: colors.text, height: 100, textAlignVertical: 'top', paddingTop: 16 }]}
+              placeholder="Brief description ..."
+              placeholderTextColor={colors.textSecondary}
+              value={description}
+              onChangeText={setDescription}
+              multiline
+              numberOfLines={4}
             />
 
             <View style={styles.row}>

@@ -11,14 +11,16 @@ const MOCK_BORROWED = [
 
 export default function BorrowedScreen() {
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('All');
   
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
-  const filtered = MOCK_BORROWED.filter(r => 
-    r.student.toLowerCase().includes(search.toLowerCase()) || 
-    r.roll.includes(search)
-  );
+  const filtered = MOCK_BORROWED.filter(r => {
+    const matchesSearch = r.student.toLowerCase().includes(search.toLowerCase()) || r.roll.includes(search);
+    const matchesFilter = filter === 'All' || r.status === filter;
+    return matchesSearch && matchesFilter;
+  });
 
   const renderItem = ({ item }: { item: any }) => (
     <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -64,6 +66,23 @@ export default function BorrowedScreen() {
             onChangeText={setSearch}
           />
         </View>
+        <View style={styles.filterRow}>
+          {['All', 'Active', 'Overdue'].map(f => (
+            <Pressable 
+              key={f} 
+              style={[
+                styles.filterChip, 
+                { 
+                  backgroundColor: filter === f ? colors.primary : colors.surface,
+                  borderColor: filter === f ? colors.primary : colors.border
+                }
+              ]}
+              onPress={() => setFilter(f)}
+            >
+              <Text style={[styles.filterText, { color: filter === f ? '#FFF' : colors.textSecondary }]}>{f}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
 
       <FlatList
@@ -92,6 +111,21 @@ const styles = StyleSheet.create({
   },
   searchIcon: { marginRight: 8 },
   searchInput: { flex: 1, fontSize: 16 },
+  filterRow: {
+    flexDirection: 'row',
+    marginTop: 16,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  filterText: {
+    fontWeight: '600',
+    fontSize: 14,
+  },
   list: { padding: 16 },
   card: {
     padding: 16,

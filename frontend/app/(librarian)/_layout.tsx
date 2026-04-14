@@ -47,8 +47,9 @@ export default function LibrarianTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="bar-chart" color={color} />,
+          headerShown: false,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -57,7 +58,7 @@ export default function LibrarianTabLayout() {
           title: 'Books',
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
@@ -69,7 +70,7 @@ export default function LibrarianTabLayout() {
           title: 'Requests',
           tabBarIcon: ({ color }) => <TabBarIcon name="inbox" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
@@ -81,7 +82,7 @@ export default function LibrarianTabLayout() {
           title: 'Loans',
           tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
@@ -93,7 +94,7 @@ export default function LibrarianTabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerLeft: () => (
-            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 15 }}>
+            <Pressable onPress={() => router.push('/(librarian)')} style={{ marginLeft: 16, marginRight: 16, padding: 8 }}>
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
