@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -17,7 +17,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     if (!email || !password) return;
     setErrorMsg('');
-    
+
     const success = await signIn(email, password);
     if (success) {
       router.replace('/');
@@ -27,7 +27,7 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
@@ -35,7 +35,7 @@ export default function LoginScreen() {
         colors={[colors.primary, colors.primaryLight]}
         style={StyleSheet.absoluteFillObject}
       />
-      
+
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Log in to Campus Library</Text>
@@ -61,16 +61,16 @@ export default function LoginScreen() {
           onChangeText={setPassword}
         />
 
-        <Pressable 
+        <Pressable
           style={({ pressed }) => [
             styles.button,
             { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
-          ]} 
+          ]}
           onPress={handleLogin}
         >
           <Text style={styles.buttonText}>Log In</Text>
         </Pressable>
-        
+
         <View style={styles.footer}>
           <Text style={{ color: colors.textSecondary }}>Don't have an account?</Text>
           <Pressable onPress={() => router.push('/(auth)/signup')}>

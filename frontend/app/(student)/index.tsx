@@ -33,7 +33,7 @@ export default function StudentHomeDashboard() {
           <Text style={[styles.greetingSub, { color: colors.textSecondary }]}>{greeting}</Text>
           <Text style={[styles.greetingMain, { color: colors.text }]}>Hello, {user?.name?.split(' ')[0] || 'User'}!</Text>
           <Text style={[styles.deptText, { color: colors.textSecondary }]}>
-            {user?.department || 'Department'} {user?.role === 'student' ? '· 2nd Year' : '· Faculty'}
+            {user?.department || 'Department'} {user?.role === 'reader' ? '· Reader' : '· Faculty'}
           </Text>
         </View>
         <Pressable 

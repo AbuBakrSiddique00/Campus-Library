@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-export type UserRole = 'student' | 'teacher' | 'librarian';
+export type UserRole = 'reader' | 'librarian';
 
 export interface User {
   id: string;

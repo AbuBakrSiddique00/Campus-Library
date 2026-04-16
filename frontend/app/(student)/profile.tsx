@@ -22,7 +22,7 @@ export default function ProfileScreen() {
         <View style={styles.avatarPlaceholder}>
           <FontAwesome name="user" size={40} color={colors.textSecondary} />
         </View>
-        <Text style={[styles.name, { color: colors.text }]}>{user?.name || (user?.role === 'teacher' ? 'Teacher' : 'Student')}</Text>
+        <Text style={[styles.name, { color: colors.text }]}>{user?.name || 'Reader'}</Text>
         {user?.rollNumber ? (
           <Text style={[styles.roll, { color: colors.textSecondary }]}>Roll No: {user.rollNumber}</Text>
         ) : null}

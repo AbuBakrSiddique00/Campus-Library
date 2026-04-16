@@ -11,7 +11,7 @@ export default function Index() {
   }
 
   // Otherwise direct to appropriate role-based dashboard
-  if (user.role === 'student' || user.role === 'teacher') {
+  if (user.role === 'reader') {
     return <Redirect href="/(student)" />;
   }
   

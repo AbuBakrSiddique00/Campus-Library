@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function SignupScreen() {
-  const [role, setRole] = useState<UserRole>('student');
+  const [role, setRole] = useState<UserRole>('reader');
   const [name, setName] = useState('');
   const [department, setDepartment] = useState('');
   const [email, setEmail] = useState('');
@@ -26,8 +26,8 @@ export default function SignupScreen() {
       setErrorMsg('Please fill in all required fields.');
       return;
     }
-    if (role === 'student' && (!roll || !session)) {
-      setErrorMsg('Roll number & Session are required for students.');
+    if (role === 'reader' && (!roll || !session)) {
+      setErrorMsg('Roll number & Session are required for readers.');
       return;
     }
     if (password !== confirmPassword) {
@@ -36,7 +36,7 @@ export default function SignupScreen() {
     }
 
     const success = await signUp(
-      { name, department, email, role, rollNumber: role === 'student' ? roll : undefined, session: role === 'student' ? session : undefined }, 
+      { name, department, email, role, rollNumber: role === 'reader' ? roll : undefined, session: role === 'reader' ? session : undefined }, 
       password
     );
 
@@ -48,7 +48,7 @@ export default function SignupScreen() {
     }
   };
 
-  const emailLabel = role === 'student' ? 'Student Email' : role === 'teacher' ? 'Teacher Email' : 'Librarian Email';
+  const emailLabel = role === 'reader' ? 'Reader Email' : 'Librarian Email';
 
   return (
     <KeyboardAvoidingView 
@@ -68,7 +68,7 @@ export default function SignupScreen() {
         {errorMsg ? <Text style={[styles.errorText, { color: colors.error }]}>{errorMsg}</Text> : null}
 
         <View style={styles.roleContainer}>
-          {(['student', 'teacher', 'librarian'] as UserRole[]).map((r) => (
+          {(['reader', 'librarian'] as UserRole[]).map((r) => (
             <Pressable 
               key={r}
               style={[styles.roleBtn, { 
@@ -100,7 +100,7 @@ export default function SignupScreen() {
           onChangeText={setDepartment}
         />
 
-        {role === 'student' && (
+        {role === 'reader' && (
           <>
             <TextInput
               style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.surface }]}
