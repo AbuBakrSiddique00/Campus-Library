@@ -21,7 +21,7 @@ export default function RequestsScreen() {
   );
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.cardHeader}>
         <View>
           <Text style={[styles.student, { color: colors.text }]}>{item.student}</Text>
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 16,
     borderRadius: 16,
+    borderWidth: 1,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

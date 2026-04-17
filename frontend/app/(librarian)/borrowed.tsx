@@ -1,12 +1,39 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable } from 'react-native';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 const MOCK_BORROWED = [
-  { id: '1', student: 'Alice M.', roll: '101', book: 'Data Structures and Algorithms', due: '2026-04-10', status: 'Active' },
-  { id: '2', student: 'Bob S.', roll: '105', book: 'Operating Systems', due: '2026-03-30', status: 'Overdue' },
+  {
+    id: '1',
+    student: 'Alice M.',
+    roll: '101',
+    book: 'Data Structures and Algorithms',
+    due: '2026-04-10',
+    status: 'Active',
+    type: 'book',
+    author: 'Thomas H. Cormen',
+    available: 1,
+    totalCopies: 4,
+    location: 'Shelf C - Row 1',
+    description: 'Classic reference on algorithm design, analysis, and core data structures.',
+  },
+  {
+    id: '2',
+    student: 'Bob S.',
+    roll: '105',
+    book: 'Operating Systems',
+    due: '2026-03-30',
+    status: 'Overdue',
+    type: 'book',
+    author: 'Andrew S. Tanenbaum',
+    available: 0,
+    totalCopies: 3,
+    location: 'Shelf B - Row 4',
+    description: 'Comprehensive overview of OS fundamentals: processes, memory, and storage.',
+  },
 ];
 
 export default function BorrowedScreen() {
@@ -23,7 +50,7 @@ export default function BorrowedScreen() {
   });
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.cardHeader}>
         <View>
           <Text style={[styles.student, { color: colors.text }]}>{item.student}</Text>
@@ -41,7 +68,25 @@ export default function BorrowedScreen() {
       
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
       
-      <Text style={[styles.bookTitle, { color: colors.text }]}>{item.book}</Text>
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: '/(student)/detail/[id]',
+            params: {
+              id: item.id,
+              type: item.type,
+              title: item.book,
+              author: item.author,
+              available: String(item.available),
+              totalCopies: String(item.totalCopies),
+              location: item.location,
+              description: item.description,
+            },
+          })
+        }
+      >
+        <Text style={[styles.bookTitle, { color: colors.text }]}>{item.book}</Text>
+      </Pressable>
       <Text style={[styles.dueDate, { color: item.status === 'Overdue' ? colors.error : colors.textSecondary }]}>
         Due: {item.due}
       </Text>
@@ -130,6 +175,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 16,
     borderRadius: 16,
+    borderWidth: 1,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

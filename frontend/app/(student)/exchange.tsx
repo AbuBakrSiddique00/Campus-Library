@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -19,7 +19,7 @@ export default function ExchangeScreen() {
     : MOCK_EXCHANGES.filter(item => item.type === activeTab);
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.cardHeader}>
         <Text style={[styles.typeBadge, { 
           backgroundColor: item.type === 'Offer' ? colors.success + '20' : colors.primary + '20',
@@ -45,6 +45,7 @@ export default function ExchangeScreen() {
             key={tab}
             style={[
               styles.tab, 
+              { borderColor: colors.border },
               activeTab === tab && { backgroundColor: colors.primary, borderColor: colors.primary }
             ]}
             onPress={() => setActiveTab(tab as any)}
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#DDE5F5',
   },
   tabText: {
     fontWeight: '600',
@@ -91,6 +92,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 16,
     borderRadius: 16,
+    borderWidth: 1,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

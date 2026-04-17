@@ -1,12 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
+import React from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 const MOCK_LOANS = [
-  { id: '1', title: 'Data Structures and Algorithms', borrowDate: '2026-04-01', returnDate: '2026-04-10', status: 'Active' },
-  { id: '2', title: 'Introduction to Mechanics', borrowDate: '2026-03-15', returnDate: '2026-03-30', status: 'Overdue' },
+  {
+    id: '1',
+    title: 'Data Structures and Algorithms',
+    borrowDate: '2026-04-01',
+    returnDate: '2026-04-10',
+    status: 'Active',
+    type: 'book',
+    author: 'Thomas H. Cormen',
+    available: 1,
+    totalCopies: 4,
+    location: 'Shelf C - Row 1',
+    description: 'Classic reference on algorithm design, analysis, and core data structures.',
+  },
+  {
+    id: '2',
+    title: 'Introduction to Mechanics',
+    borrowDate: '2026-03-15',
+    returnDate: '2026-03-30',
+    status: 'Overdue',
+    type: 'book',
+    author: 'Kleppner & Kolenkow',
+    available: 0,
+    totalCopies: 3,
+    location: 'Shelf D - Row 2',
+    description: 'Mechanics fundamentals with rigorous problem-based explanations.',
+  },
 ];
 
 export default function LoanScreen() {
@@ -14,7 +39,24 @@ export default function LoanScreen() {
   const colors = Colors[colorScheme];
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/(student)/detail/[id]',
+          params: {
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            author: item.author,
+            available: String(item.available),
+            totalCopies: String(item.totalCopies),
+            location: item.location,
+            description: item.description,
+          },
+        })
+      }
+      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+    >
       <View style={styles.cardHeader}>
         <FontAwesome name="book" size={24} color={colors.primary} />
         <View style={[
@@ -35,7 +77,7 @@ export default function LoanScreen() {
           Due: {item.returnDate}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -59,6 +101,7 @@ const styles = StyleSheet.create({
   card: {
     padding: 16,
     borderRadius: 16,
+    borderWidth: 1,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

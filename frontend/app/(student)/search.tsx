@@ -1,16 +1,52 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, FlatList, Image } from 'react-native';
-import { router } from 'expo-router';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 // Mock Data
 const MOCK_DATA = [
-  { id: '1', type: 'book', title: 'Calculus Early Transcendentals', author: 'James Stewart', available: 3, location: 'Shelf A - Row 2' },
-  { id: '2', type: 'book', title: 'Data Structures and Algorithms', author: 'Thomas H. Cormen', available: 1, location: 'Shelf C - Row 1' },
-  { id: '3', type: 'paper', title: 'Deep Learning for Computer Vision', author: 'Dr. Alan Turing', available: 5, location: 'Digital / Sem Library' },
-  { id: '4', type: 'book', title: 'Operating System Concepts', author: 'Abraham Silberschatz', available: 0, location: 'Shelf B - Row 4' },
+  {
+    id: '1',
+    type: 'book',
+    title: 'Calculus Early Transcendentals',
+    author: 'James Stewart',
+    available: 3,
+    totalCopies: 5,
+    location: 'Shelf A - Row 2',
+    description: 'A rigorous introduction to calculus for engineering and mathematics coursework.',
+  },
+  {
+    id: '2',
+    type: 'book',
+    title: 'Data Structures and Algorithms',
+    author: 'Thomas H. Cormen',
+    available: 1,
+    totalCopies: 4,
+    location: 'Shelf C - Row 1',
+    description: 'Classic reference on algorithm design, analysis, and core data structures.',
+  },
+  {
+    id: '3',
+    type: 'paper',
+    title: 'Deep Learning for Computer Vision',
+    author: 'Dr. Alan Turing',
+    available: 5,
+    totalCopies: 5,
+    location: 'Digital / Sem Library',
+    description: 'Survey of modern deep learning techniques applied to vision tasks.',
+  },
+  {
+    id: '4',
+    type: 'book',
+    title: 'Operating System Concepts',
+    author: 'Abraham Silberschatz',
+    available: 0,
+    totalCopies: 3,
+    location: 'Shelf B - Row 4',
+    description: 'Comprehensive overview of OS fundamentals: processes, memory, and storage.',
+  },
 ];
 
 export default function SearchScreen() {
@@ -27,8 +63,22 @@ export default function SearchScreen() {
 
   const renderItem = ({ item }: { item: any }) => (
     <Pressable 
-      style={[styles.card, { backgroundColor: colors.surface }]}
-      onPress={() => router.push(`/(student)/detail/${item.id}`)}
+      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      onPress={() =>
+        router.push({
+          pathname: '/(student)/detail/[id]',
+          params: {
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            author: item.author,
+            available: String(item.available),
+            totalCopies: String(item.totalCopies ?? item.available),
+            location: item.location,
+            description: item.description,
+          },
+        })
+      }
     >
       <View style={[styles.iconPlaceholder, { backgroundColor: colors.background }]}>
         <FontAwesome name={item.type === 'book' ? 'book' : 'file-text-o'} size={32} color={colors.primary} />
@@ -65,13 +115,13 @@ export default function SearchScreen() {
         {/* Tab Toggles */}
         <View style={styles.tabsContainer}>
           <Pressable 
-            style={[styles.tab, activeTab === 'book' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+            style={[styles.tab, { borderColor: colors.border }, activeTab === 'book' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setActiveTab('book')}
           >
             <Text style={[styles.tabText, { color: activeTab === 'book' ? '#FFF' : colors.textSecondary }]}>Books</Text>
           </Pressable>
           <Pressable 
-            style={[styles.tab, activeTab === 'paper' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+            style={[styles.tab, { borderColor: colors.border }, activeTab === 'paper' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
             onPress={() => setActiveTab('paper')}
           >
             <Text style={[styles.tabText, { color: activeTab === 'paper' ? '#FFF' : colors.textSecondary }]}>Papers</Text>
@@ -117,7 +167,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -131,6 +180,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     borderRadius: 16,
+    borderWidth: 1,
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',

@@ -1,15 +1,24 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Image, ScrollView } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Colors from '../../constants/Colors';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
+
+  const fullName = user?.name || 'Reader';
+  const initials = (user?.name || 'R')
+    .split(' ')
+    .map((part) => part.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleLogout = () => {
     signOut();
@@ -17,134 +26,195 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <View style={styles.avatarPlaceholder}>
-          <FontAwesome name="user" size={40} color={colors.textSecondary} />
-        </View>
-        <Text style={[styles.name, { color: colors.text }]}>{user?.name || 'Reader'}</Text>
-        {user?.rollNumber ? (
-          <Text style={[styles.roll, { color: colors.textSecondary }]}>Roll No: {user.rollNumber}</Text>
-        ) : null}
-        <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
-          <Text style={[styles.badgeText, { color: colors.primary }]}>{user?.role.toUpperCase()}</Text>
-        </View>
-      </View>
-
-      <View style={styles.infoSection}>
-        <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-          <View style={styles.row}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Email</Text>
-            <Text style={[styles.value, { color: colors.text }]}>{user?.email || 'N/A'}</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.row}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Department</Text>
-            <Text style={[styles.value, { color: colors.text }]}>{user?.department || 'N/A'}</Text>
-          </View>
-          {user?.session ? (
-            <>
-              <View style={styles.divider} />
-              <View style={styles.row}>
-                <Text style={[styles.label, { color: colors.textSecondary }]}>Session</Text>
-                <Text style={[styles.value, { color: colors.text }]}>{user.session}</Text>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <LinearGradient
+          colors={[colors.primary, colors.primaryLight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroCard}
+        >
+          <View style={styles.heroTop}>
+            <View style={styles.avatarRing}>
+              <View style={styles.avatarCore}>
+                <Text style={styles.avatarInitials}>{initials}</Text>
               </View>
-            </>
-          ): null}
+            </View>
+            <View style={styles.rolePill}>
+              <Text style={styles.rolePillText}>{user?.role === 'librarian' ? 'Librarian' : 'Reader'}</Text>
+            </View>
+          </View>
+          <Text style={styles.heroName}>Hi {fullName}.</Text>
+          <Text style={styles.heroSub}>
+            {user?.department || 'Department'}{user?.rollNumber ? ` · Roll ${user.rollNumber}` : ''}
+          </Text>
+        </LinearGradient>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Account details</Text>
+
+          <View style={[styles.infoRow, { borderBottomColor: colors.border }]}>
+            <View style={styles.infoLabelWrap}>
+              <FontAwesome name="envelope-o" size={14} color={colors.textSecondary} />
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Email</Text>
+            </View>
+            <Text style={[styles.infoValue, { color: colors.text }]} numberOfLines={1}>
+              {user?.email || 'N/A'}
+            </Text>
+          </View>
+
+          <View style={[styles.infoRow, { borderBottomColor: colors.border }]}>
+            <View style={styles.infoLabelWrap}>
+              <FontAwesome name="building-o" size={14} color={colors.textSecondary} />
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Department</Text>
+            </View>
+            <Text style={[styles.infoValue, { color: colors.text }]} numberOfLines={1}>
+              {user?.department || 'N/A'}
+            </Text>
+          </View>
+
+          {user?.session ? (
+            <View style={styles.infoRow}>
+              <View style={styles.infoLabelWrap}>
+                <FontAwesome name="calendar" size={14} color={colors.textSecondary} />
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Session</Text>
+              </View>
+              <Text style={[styles.infoValue, { color: colors.text }]}>{user.session}</Text>
+            </View>
+          ) : null}
         </View>
 
         <Pressable
           style={({ pressed }) => [
             styles.logoutBtn,
-            { backgroundColor: colors.error, opacity: pressed ? 0.8 : 1 }
+            { backgroundColor: colors.error, opacity: pressed ? 0.88 : 1, shadowColor: colors.error },
           ]}
           onPress={handleLogout}
         >
-          <Text style={styles.logoutText}>Log Out</Text>
+          <FontAwesome name="sign-out" size={16} color="#FFF" />
+          <Text style={styles.logoutText}>Log out</Text>
         </Pressable>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+  screen: { flex: 1 },
+  scroll: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 34,
+    gap: 14,
   },
-  avatarPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
+  heroCard: {
+    borderRadius: 24,
+    padding: 18,
+    overflow: 'hidden',
   },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  roll: {
-    fontSize: 16,
-    marginBottom: 12,
-  },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  infoSection: {
-    padding: 24,
-  },
-  infoCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  row: {
+  heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    alignItems: 'center',
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#F3F4F6',
-  },
-  label: {
-    fontSize: 16,
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  logoutBtn: {
-    height: 56,
-    borderRadius: 12,
+  avatarRing: {
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    backgroundColor: 'rgba(255,255,255,0.28)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  avatarCore: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarInitials: {
+    color: '#2D5BFF',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  rolePill: {
+    borderRadius: 999,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255,255,255,0.23)',
+  },
+  rolePillText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  heroName: {
+    marginTop: 14,
+    color: '#FFF',
+    fontSize: 26,
+    fontWeight: '900',
+  },
+  heroSub: {
+    marginTop: 4,
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 13,
+  },
+  card: {
+    borderRadius: 18,
+    borderWidth: 1,
+    padding: 16,
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  infoLabelWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 1,
+  },
+  infoLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    maxWidth: '56%',
+    textAlign: 'right',
+  },
+  logoutBtn: {
+    height: 54,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 4,
   },
   logoutText: {
     color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  }
+    fontSize: 16,
+    fontWeight: '800',
+  },
 });

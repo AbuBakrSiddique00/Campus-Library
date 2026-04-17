@@ -1,93 +1,134 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Platform } from 'react-native';
-import Colors from '../../constants/Colors';
+import AppLogo from '@/components/AppLogo';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router } from 'expo-router';
-import { useAuth } from '../../contexts/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import NotificationPopup from '../../components/NotificationPopup';
+import Colors from '../../constants/Colors';
+import { useAuth } from '../../contexts/AuthContext';
+
+const TOOLS = [
+  { id: 'requests', icon: 'inbox', title: 'Requests Inbox', subtitle: 'Review and approve pending requests', meta: '18 pending', route: '/(librarian)/requests', accent: '#14C7A5' },
+  { id: 'add', icon: 'plus', title: 'Catalog Entry', subtitle: 'Add books or research papers', meta: 'Quick add', route: '/(librarian)/add', accent: '#2D5BFF' },
+  { id: 'borrowed', icon: 'exchange', title: 'Returns Desk', subtitle: 'Process returns and update stock', meta: '132 active', route: '/(librarian)/borrowed', accent: '#E5484D' },
+] as const;
 
 export default function LibrarianDashboard() {
   const { user } = useAuth();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const [showNotifications, setShowNotifications] = useState(false);
+  const firstName = user?.name?.split(' ')[0] || 'Admin';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      
-      {/* Header Section (Sticky) */}
-      <View style={[styles.header, { backgroundColor: colors.background }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.greetingSub, { color: colors.textSecondary }]}>LIBRARIAN SECURE PORTAL</Text>
-          <Text style={[styles.greetingMain, { color: colors.text }]}>Hello, Admin!</Text>
-        </View>
-        <Pressable 
-          style={[styles.profileContainer, { backgroundColor: colors.surface }]}
-          onPress={() => setShowNotifications(true)}
-        >
-          <FontAwesome name="bell" size={20} color={colors.primary} />
-          <View style={styles.badge}><Text style={styles.badgeText}>3</Text></View>
-        </Pressable>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <View style={styles.topBar}>
+            <View style={styles.topBarSpacer} />
+            <AppLogo size="sm" />
+            <Pressable
+              style={[styles.bellContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => setShowNotifications(true)}
+            >
+              <View style={[styles.bellGlow, { backgroundColor: colors.primary + '14' }]}>
+                <FontAwesome name="bell-o" size={17} color={colors.primary} />
+              </View>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>•</Text>
+              </View>
+            </Pressable>
+          </View>
 
-        {/* Global Overview Banner */}
+          <View style={styles.headerLeft}>
+            <Text style={[styles.greetingSub, { color: colors.textSecondary }]}>Library operations dashboard</Text>
+            <Text style={[styles.greetingMain, { color: colors.text }]}>Welcome back, {firstName}</Text>
+          </View>
+        </View>
+
         <LinearGradient
-          colors={[colors.primaryLight, colors.primary]}
-          start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-          style={styles.bannerCard}
+          colors={[colors.primary, colors.primaryLight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroCard}
         >
-          <Text style={styles.bannerOverline}>CAMPUS LIBRARY STATUS</Text>
-          <Text style={styles.bannerMain}>18 Pending Reqs</Text>
-          <Text style={styles.bannerSub}>Review requests immediately to avoid backlog.</Text>
-          <FontAwesome name="server" size={80} color="rgba(255,255,255,0.15)" style={styles.bannerWatermark} />
+          <Text style={styles.heroOverline}>Operations health</Text>
+          <Text style={styles.heroTitle}>18 requests need review</Text>
+          <Text style={styles.heroSub}>Process approvals quickly to keep circulation smooth across departments.</Text>
+          <View style={styles.heroMetaRow}>
+            <View style={styles.heroMetaPill}>
+              <FontAwesome name="warning" size={11} color="#FFF" />
+              <Text style={styles.heroMetaText}>7 overdue books</Text>
+            </View>
+            <View style={styles.heroMetaPill}>
+              <FontAwesome name="book" size={11} color="#FFF" />
+              <Text style={styles.heroMetaText}>132 active loans</Text>
+            </View>
+          </View>
+          <FontAwesome name="line-chart" size={88} color="rgba(255,255,255,0.15)" style={styles.heroWatermark} />
         </LinearGradient>
 
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>METRICS</Text>
-        <View style={styles.statsRow}>
-          <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.statNumber, { color: colors.primary }]}>1,245</Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>TOTAL BOOKS</Text>
+        <View style={styles.metricRow}>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.primary }]}>1,245</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Total books</Text>
           </View>
-          <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.statNumber, { color: colors.secondary }]}>132</Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>ACTIVE LOANS</Text>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.secondary }]}>132</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Active loans</Text>
           </View>
-          <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.statNumber, { color: colors.error }]}>7</Text>
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>OVERDUE</Text>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.error }]}>7</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Overdue</Text>
           </View>
         </View>
 
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginTop: 16 }]}>MANAGEMENT TOOLS</Text>
-        <View style={styles.grid}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Management tools</Text>
+          <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>Core workflows for daily operations</Text>
+        </View>
+        <View style={styles.toolsBlock}>
           <Pressable
-            style={[styles.gridItem, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/(librarian)/add')}
+            onPress={() => router.push(TOOLS[0].route)}
+            style={[styles.featuredToolCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
           >
-            <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(124, 58, 237, 0.15)' : '#F3E8FF' }]}>
-              <FontAwesome name="plus" size={22} color={colors.primary} />
+            <View style={[styles.toolIconWrap, { backgroundColor: TOOLS[0].accent + '1A' }]}>
+              <FontAwesome name={TOOLS[0].icon} size={20} color={TOOLS[0].accent} />
             </View>
-            <Text style={[styles.gridTitle, { color: colors.text }]}>Add Title</Text>
-            <Text style={[styles.gridSub, { color: colors.textSecondary }]}>New book entry</Text>
+            <View style={styles.featuredToolBody}>
+              <Text style={[styles.toolTitle, { color: colors.text }]}>{TOOLS[0].title}</Text>
+              <Text style={[styles.toolSub, { color: colors.textSecondary }]}>{TOOLS[0].subtitle}</Text>
+              <Text style={[styles.toolMeta, { color: TOOLS[0].accent }]}>{TOOLS[0].meta}</Text>
+            </View>
+            <FontAwesome name="chevron-right" size={14} color={colors.textSecondary} />
           </Pressable>
 
-          <Pressable
-            style={[styles.gridItem, { backgroundColor: colors.surface }]}
-            onPress={() => router.push('/(librarian)/requests')}
-          >
-            <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(239, 68, 68, 0.15)' : '#FEE2E2' }]}>
-              <FontAwesome name="check-square-o" size={22} color={colors.error} />
-            </View>
-            <Text style={[styles.gridTitle, { color: colors.text }]}>Requests</Text>
-            <Text style={[styles.gridSub, { color: colors.textSecondary }]}>18 waiting</Text>
-          </Pressable>
+          <View style={styles.compactToolsRow}>
+            {TOOLS.slice(1).map((tool) => (
+              <Pressable
+                key={tool.id}
+                onPress={() => router.push(tool.route)}
+                style={[styles.compactToolCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              >
+                <View style={[styles.toolIconWrap, { backgroundColor: tool.accent + '1A' }]}>
+                  <FontAwesome name={tool.icon} size={18} color={tool.accent} />
+                </View>
+                <Text style={[styles.compactToolTitle, { color: colors.text }]}>{tool.title}</Text>
+                <Text style={[styles.toolSub, { color: colors.textSecondary }]} numberOfLines={2}>
+                  {tool.subtitle}
+                </Text>
+                <View style={[styles.metaPill, { backgroundColor: tool.accent + '1A' }]}>
+                  <Text style={[styles.metaPillText, { color: tool.accent }]}>{tool.meta}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
         </View>
 
       </ScrollView>
+
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />
     </View>
   );
@@ -96,85 +137,159 @@ export default function LibrarianDashboard() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 56 : 32,
+    paddingBottom: 36,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingBottom: 16,
-    zIndex: 10,
+    marginBottom: 18,
   },
-  greetingSub: { fontSize: 12, fontWeight: 'bold', letterSpacing: 1, marginBottom: 4 },
-  greetingMain: { fontSize: 28, fontWeight: '900', marginBottom: 2 },
-  profileContainer: {
-    width: 48, height: 48,
-    borderRadius: 24,
-    justifyContent: 'center', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 8, elevation: 3,
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  topBarSpacer: {
+    width: 48,
+    height: 48,
+  },
+  headerLeft: { alignItems: 'center' },
+  greetingSub: { fontSize: 13, fontWeight: '700', marginTop: 12, textTransform: 'uppercase', letterSpacing: 0.6 },
+  greetingMain: { fontSize: 26, fontWeight: '900', marginTop: 4, textAlign: 'center' },
+  bellContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  bellGlow: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badge: {
     position: 'absolute',
-    top: 10, right: 12,
+    top: 9,
+    right: 9,
     backgroundColor: '#EF4444',
-    width: 14, height: 14,
-    borderRadius: 7,
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, borderColor: '#FFF'
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.2,
+    borderColor: '#FFF',
   },
-  badgeText: { color: '#FFF', fontSize: 8, fontWeight: 'bold' },
-  bannerCard: {
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 24,
+  badgeText: { color: '#FFF', fontSize: 9, fontWeight: '900', lineHeight: 10 },
+  heroCard: {
+    borderRadius: 24,
+    padding: 22,
+    marginBottom: 18,
     overflow: 'hidden',
   },
-  bannerOverline: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: 'bold', letterSpacing: 0.5, marginBottom: 8 },
-  bannerMain: { color: '#FFF', fontSize: 26, fontWeight: 'bold', marginBottom: 8 },
-  bannerSub: { color: 'rgba(255,255,255,0.9)', fontSize: 14 },
-  bannerWatermark: { position: 'absolute', right: -15, bottom: -20, transform: [{ rotate: '-15deg' }] },
-  statsRow: {
+  heroOverline: { color: 'rgba(255,255,255,0.82)', fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' },
+  heroTitle: { color: '#FFF', fontSize: 27, fontWeight: '900', marginTop: 8, marginBottom: 8, maxWidth: '86%' },
+  heroSub: { color: 'rgba(255,255,255,0.92)', fontSize: 14, lineHeight: 21, maxWidth: '86%' },
+  heroMetaRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
+  heroMetaPill: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 32,
-    gap: 12,
-  },
-  statBox: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  statNumber: { fontSize: 24, fontWeight: '900', marginBottom: 4 },
-  statLabel: { fontSize: 11, fontWeight: 'bold', letterSpacing: 0.5 },
-  sectionTitle: { fontSize: 13, fontWeight: 'bold', letterSpacing: 1, marginBottom: 16 },
-  grid: {
+  heroMetaText: { color: '#FFF', fontSize: 11, fontWeight: '700' },
+  heroWatermark: { position: 'absolute', right: -12, bottom: -16, transform: [{ rotate: '-8deg' }] },
+  metricRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 22,
   },
-  gridItem: {
+  metricCard: {
     flex: 1,
-    padding: 16,
     borderRadius: 16,
+    borderWidth: 1,
+    paddingVertical: 14,
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  iconWrapper: {
-    width: 44, height: 44,
+  metricValue: { fontSize: 23, fontWeight: '900' },
+  metricLabel: { fontSize: 11, marginTop: 3, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  sectionHeader: { marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '800' },
+  sectionSubtitle: { fontSize: 12, marginTop: 4, fontWeight: '500' },
+  toolsBlock: {
+    gap: 10,
+    marginBottom: 20,
+  },
+  featuredToolCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 9,
+    elevation: 2,
+  },
+  featuredToolBody: {
+    flex: 1,
+  },
+  compactToolsRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  compactToolCard: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 9,
+    elevation: 2,
+  },
+  toolIconWrap: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    justifyContent: 'center', alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  gridTitle: { fontSize: 14, fontWeight: 'bold', marginBottom: 4, textAlign: 'center' },
-  gridSub: { fontSize: 11, textAlign: 'center' },
+  toolTitle: { fontSize: 14, fontWeight: '800' },
+  compactToolTitle: { fontSize: 13, fontWeight: '800', marginBottom: 4 },
+  toolSub: { fontSize: 12, marginTop: 4, lineHeight: 17 },
+  toolMeta: { fontSize: 11, fontWeight: '700', marginTop: 8 },
+  metaPill: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  metaPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
 });

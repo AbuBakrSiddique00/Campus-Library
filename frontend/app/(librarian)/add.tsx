@@ -1,13 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 // Mock data for search
 const MOCK_BOOKS = [
-  { id: '1', title: 'Introduction to Algorithms', author: 'Thomas H. Cormen', shelf: 'A-4', copies: 5 },
-  { id: '2', title: 'Clean Code', author: 'Robert C. Martin', shelf: 'B-1', copies: 2 },
+  {
+    id: '1',
+    type: 'book',
+    title: 'Introduction to Algorithms',
+    author: 'Thomas H. Cormen',
+    shelf: 'A-4',
+    copies: 5,
+    totalCopies: 5,
+    location: 'Shelf A - Row 4',
+    description: 'Comprehensive guide to algorithms with practical analysis and core techniques.',
+  },
+  {
+    id: '2',
+    type: 'book',
+    title: 'Clean Code',
+    author: 'Robert C. Martin',
+    shelf: 'B-1',
+    copies: 2,
+    totalCopies: 3,
+    location: 'Shelf B - Row 1',
+    description: 'Best practices for writing clean, maintainable, and readable software.',
+  },
 ];
 
 export default function BooksScreen() {
@@ -48,6 +69,7 @@ export default function BooksScreen() {
         <View style={styles.toggleContainer}>
           <Pressable 
             style={[styles.toggleBtn, activeTab === 'add' && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+            
             onPress={() => setActiveTab('add')}
           >
             <Text style={[styles.toggleText, { color: activeTab === 'add' ? '#FFF' : colors.textSecondary }]}>Add New</Text>
@@ -63,7 +85,7 @@ export default function BooksScreen() {
 
       {activeTab === 'add' ? (
         <ScrollView style={{ flex: 1 }}>
-          <View style={[styles.form, { backgroundColor: colors.surface }]}>
+          <View style={[styles.form, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             
             <View style={[styles.toggleContainer, { marginBottom: 20 }]}>
               <Pressable 
@@ -136,7 +158,7 @@ export default function BooksScreen() {
             <Pressable 
               style={({ pressed }) => [
                 styles.submitBtn,
-                { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1 }
+                { backgroundColor: colors.primary, opacity: pressed ? 0.9 : 1, shadowColor: colors.primary }
               ]} 
               onPress={handleAdd}
             >
@@ -163,7 +185,24 @@ export default function BooksScreen() {
             keyExtractor={item => item.id}
             contentContainerStyle={styles.list}
             renderItem={({ item }) => (
-              <View style={[styles.bookCard, { backgroundColor: colors.surface }]}>
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: '/(student)/detail/[id]',
+                    params: {
+                      id: item.id,
+                      type: item.type,
+                      title: item.title,
+                      author: item.author,
+                      available: String(item.copies),
+                      totalCopies: String(item.totalCopies ?? item.copies),
+                      location: item.location ?? item.shelf,
+                      description: item.description,
+                    },
+                  })
+                }
+                style={[styles.bookCard, { backgroundColor: colors.surface }]}
+              >
                 <View style={styles.bookDetails}>
                   <Text style={[styles.bookTitle, { color: colors.text }]}>{item.title}</Text>
                   <Text style={[styles.bookAuthor, { color: colors.textSecondary }]}>{item.author}</Text>
@@ -172,7 +211,7 @@ export default function BooksScreen() {
                   <Text style={[styles.statValue, { color: colors.primary }]}>{item.copies}</Text>
                   <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Copies</Text>
                 </View>
-              </View>
+              </Pressable>
             )}
           />
         </View>
@@ -201,7 +240,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#DDE5F5',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -212,6 +251,7 @@ const styles = StyleSheet.create({
   form: {
     margin: 16,
     padding: 24,
+    borderWidth: 1,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -246,6 +286,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 4,
   },
   submitText: {
     color: '#FFF',
@@ -271,6 +315,8 @@ const styles = StyleSheet.create({
   bookCard: {
     flexDirection: 'row',
     padding: 16,
+    borderWidth: 1,
+    borderColor: '#DDE5F5',
     borderRadius: 16,
     marginBottom: 12,
     shadowColor: '#000',
@@ -297,7 +343,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 60,
     borderLeftWidth: 1,
-    borderLeftColor: '#E5E7EB',
+    borderLeftColor: '#DDE5F5',
   },
   statValue: {
     fontSize: 18,

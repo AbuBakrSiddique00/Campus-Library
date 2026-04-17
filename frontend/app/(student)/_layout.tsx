@@ -3,10 +3,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useAuth } from '../../contexts/AuthContext';
 import { router } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import NotificationPopup from '../../components/NotificationPopup';
+import AppLogo from '@/components/AppLogo';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -40,13 +40,45 @@ export default function StudentTabLayout() {
           borderBottomColor: themeColors.border,
         },
         headerTitleStyle: {
-          fontWeight: 'bold',
+          fontWeight: '800',
           color: themeColors.text,
         },
+        headerTitleAlign: 'center',
+        headerLeftContainerStyle: {
+          minWidth: 52,
+        },
+        headerRightContainerStyle: {
+          minWidth: 52,
+        },
+        headerTitle: () => <AppLogo size="sm" />,
         headerTintColor: themeColors.primary,
         headerRight: () => (
-          <Pressable onPress={() => setShowNotifications(true)} style={{ marginRight: 15 }}>
-            <FontAwesome name="bell" size={20} color={themeColors.primary} />
+          <Pressable
+            onPress={() => setShowNotifications(true)}
+            style={{
+              marginRight: 14,
+              width: 38,
+              height: 38,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: themeColors.border,
+              backgroundColor: themeColors.background,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <FontAwesome name="bell-o" size={18} color={themeColors.primary} />
+            <View
+              style={{
+                position: 'absolute',
+                top: 7,
+                right: 7,
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: '#EF4444',
+              }}
+            />
           </Pressable>
         ),
       }}>

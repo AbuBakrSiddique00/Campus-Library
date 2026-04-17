@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import Colors from '../../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router, useLocalSearchParams } from 'expo-router';
+import React from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Colors from '../../../constants/Colors';
 
 // Mock function (in reality we fetch based on ID)
 const getMockData = (id: string) => {
@@ -19,20 +20,54 @@ const getMockData = (id: string) => {
   };
 };
 
+const getParam = (value: string | string[] | undefined, fallback: string) => {
+  if (Array.isArray(value)) {
+    return value[0] ?? fallback;
+  }
+  return value ?? fallback;
+};
+
+const getNumberParam = (value: string | string[] | undefined, fallback: number) => {
+  const resolved = Array.isArray(value) ? value[0] : value;
+  const parsed = Number(resolved);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
 export default function DetailScreen() {
-  const { id } = useLocalSearchParams();
+  const { id, title, author, available, totalCopies, location, description, type } = useLocalSearchParams();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
-  
-  const item = getMockData(id as string);
+  const fallback = getMockData(getParam(id as string | string[] | undefined, ''));
+  const item = {
+    id: getParam(id as string | string[] | undefined, fallback.id),
+    type: getParam(type as string | string[] | undefined, fallback.type),
+    title: getParam(title as string | string[] | undefined, fallback.title),
+    author: getParam(author as string | string[] | undefined, fallback.author),
+    available: getNumberParam(available as string | string[] | undefined, fallback.available),
+    totalCopies: getNumberParam(totalCopies as string | string[] | undefined, fallback.totalCopies),
+    location: getParam(location as string | string[] | undefined, fallback.location),
+    description: getParam(description as string | string[] | undefined, fallback.description),
+  };
+  const heroIcon = item.type === 'paper' ? 'file-text-o' : 'book';
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.imageArea, { backgroundColor: colors.primary }]}>
-        <FontAwesome name="book" size={80} color="#FFF" style={styles.heroIcon} />
-      </View>
+      <LinearGradient
+        colors={[colors.primary, colors.primaryLight]}
+        style={styles.imageArea}
+      >
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.backButton}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <FontAwesome name="arrow-left" size={18} color="#FFF" />
+        </Pressable>
+        <FontAwesome name={heroIcon} size={80} color="#FFF" style={styles.heroIcon} />
+      </LinearGradient>
       
-      <View style={[styles.contentArea, { backgroundColor: colors.surface }]}>
+      <View style={[styles.contentArea, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>{item.title}</Text>
         <Text style={[styles.author, { color: colors.textSecondary }]}>By {item.author}</Text>
         
@@ -71,6 +106,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   heroIcon: {
     opacity: 0.9,
   },
@@ -79,6 +127,7 @@ const styles = StyleSheet.create({
     marginTop: -30,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+    borderWidth: 1,
     padding: 24,
   },
   title: {

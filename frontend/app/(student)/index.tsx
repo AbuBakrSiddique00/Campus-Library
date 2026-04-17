@@ -1,18 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Platform } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import Colors from '../../constants/Colors';
+import AppLogo from '@/components/AppLogo';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import NotificationPopup from '../../components/NotificationPopup';
+import Colors from '../../constants/Colors';
+import { useAuth } from '../../contexts/AuthContext';
 
-// Mock Data for "Recently Added"
 const RECENT_BOOKS = [
-  { id: '1', title: 'Design Patterns', author: 'Gang of Four', dept: 'CSE Library', available: true, copies: 2 },
-  { id: '2', title: 'Computer Networks', author: 'Andrew S. Tanenbaum', dept: 'CSE Library', available: false, copies: 0 },
+  {
+    id: '1',
+    type: 'book',
+    title: 'Design Patterns',
+    author: 'Gang of Four',
+    dept: 'CSE Library',
+    available: true,
+    copies: 2,
+    totalCopies: 5,
+    location: 'CSE Library · Shelf A - Row 3',
+    description: 'A foundational guide to reusable object-oriented design patterns used in modern software.',
+  },
+  {
+    id: '2',
+    type: 'book',
+    title: 'Computer Networks',
+    author: 'Andrew S. Tanenbaum',
+    dept: 'CSE Library',
+    available: false,
+    copies: 0,
+    totalCopies: 4,
+    location: 'CSE Library · Shelf B - Row 1',
+    description: 'Core networking concepts covering protocols, architectures, and performance essentials.',
+  },
 ];
+
+const QUICK_ACTIONS = [
+  { id: 'search', icon: 'search', title: 'Search Library', subtitle: 'Find books & papers', route: '/(student)/search', accent: '#2D5BFF' },
+  { id: 'loan', icon: 'book', title: 'My Loans', subtitle: 'Track due dates', route: '/(student)/loan', accent: '#14C7A5' },
+] as const;
 
 export default function StudentHomeDashboard() {
   const { user } = useAuth();
@@ -20,133 +47,164 @@ export default function StudentHomeDashboard() {
   const colors = Colors[colorScheme];
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Greeting logic
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'GOOD MORNING ☀️' : hour < 18 ? 'GOOD AFTERNOON 🌤️' : 'GOOD EVENING 🌙';
+  const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+  const fullName = user?.name || 'Reader';
+  const roleLabel = user?.role === 'librarian' ? 'Librarian' : 'Reader';
+  const sessionLabel = user?.session || 'Session';
+  const departmentLabel = user?.department || 'Department';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-
-      {/* Header Section */}
-      <View style={[styles.header, { backgroundColor: colors.background }]}>
-        <View style={styles.greetingWrapper}>
-          <Text style={[styles.greetingSub, { color: colors.textSecondary }]}>{greeting}</Text>
-          <Text style={[styles.greetingMain, { color: colors.text }]}>Hello, {user?.name?.split(' ')[0] || 'User'}!</Text>
-          <Text style={[styles.deptText, { color: colors.textSecondary }]}>
-            {user?.department || 'Department'} {user?.role === 'reader' ? '· Reader' : '· Faculty'}
-          </Text>
-        </View>
-        <Pressable 
-          style={[styles.bellContainer, { backgroundColor: colors.surface }]}
-          onPress={() => setShowNotifications(true)}
-        >
-          <FontAwesome name="bell" size={20} color={colors.primary} />
-          <View style={styles.badge}><Text style={styles.badgeText}>3</Text></View>
-        </Pressable>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-
-      {/* Main Banner Card */}
-      <LinearGradient
-        colors={[colors.primaryLight, colors.primary]}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        style={styles.bannerCard}
-      >
-        <Text style={styles.bannerOverline}>MY LIBRARY OVERVIEW</Text>
-        <Text style={styles.bannerMain}>2 Books Borrowed</Text>
-        <Text style={styles.bannerSub}>1 book due tomorrow — don't forget!</Text>
-        <FontAwesome name="book" size={80} color="rgba(255,255,255,0.15)" style={styles.bannerWatermark} />
-      </LinearGradient>
-
-      {/* Statistics Row */}
-      <View style={styles.statsRow}>
-        <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: colors.primary }]}>2</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>BORROWED</Text>
-        </View>
-        <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: colors.secondary }]}>248</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>AVAILABLE</Text>
-        </View>
-        <View style={[styles.statBox, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.statNumber, { color: colors.error }]}>1</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>DUE SOON</Text>
-        </View>
-      </View>
-
-      {/* Quick Actions Title */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>QUICK ACTIONS</Text>
-      </View>
-
-      {/* Quick Actions Grid */}
-      <View style={styles.grid}>
-        <Pressable
-          style={[styles.gridItem, { backgroundColor: colors.surface }]}
-          onPress={() => router.push('/(student)/search')}
-        >
-          <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(124, 58, 237, 0.15)' : '#F3E8FF' }]}>
-            <FontAwesome name="search" size={22} color={colors.primary} />
-          </View>
-          <Text style={[styles.gridTitle, { color: colors.text }]}>Search Books</Text>
-          <Text style={[styles.gridSub, { color: colors.textSecondary }]}>Find & reserve</Text>
-        </Pressable>
-
-        <Pressable
-          style={[styles.gridItem, { backgroundColor: colors.surface }]}
-          onPress={() => router.push('/(student)/loan')}
-        >
-          <View style={[styles.iconWrapper, { backgroundColor: colorScheme === 'dark' ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
-            <FontAwesome name="book" size={22} color={colors.secondary} />
-          </View>
-          <Text style={[styles.gridTitle, { color: colors.text }]}>My Books</Text>
-          <Text style={[styles.gridSub, { color: colors.textSecondary }]}>Active loans</Text>
-        </Pressable>
-      </View>
-
-      {/* Recently Added Section */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>RECENTLY ADDED</Text>
-        <Pressable><Text style={{ color: colors.primary, fontWeight: 'bold' }}>See all</Text></Pressable>
-      </View>
-
-      <View style={styles.recentList}>
-        {RECENT_BOOKS.map(book => (
-          <View key={book.id} style={[styles.bookCard, { backgroundColor: colors.surface }]}>
-            <View style={[styles.bookIconProxy, { backgroundColor: colors.background }]}>
-              <FontAwesome name="book" size={24} color={book.available ? colors.secondary : colors.primaryLight} />
-            </View>
-            <View style={styles.bookDetails}>
-              <Text style={[styles.bookTitle, { color: colors.text }]}>{book.title}</Text>
-              <Text style={[styles.bookAuthor, { color: colors.textSecondary }]}>
-                {book.author} · {book.dept}
-              </Text>
-              <View style={styles.badgeRow}>
-                {book.available ? (
-                  <View style={[styles.availabilityBadge, { backgroundColor: colorScheme === 'dark' ? 'rgba(20, 184, 166, 0.15)' : '#CCFBF1' }]}>
-                    <FontAwesome name="check" size={10} color={colors.secondary} style={{ marginRight: 4 }} />
-                    <Text style={[styles.availabilityText, { color: colors.secondary }]}>Available</Text>
-                  </View>
-                ) : (
-                  <View style={[styles.availabilityBadge, { backgroundColor: colorScheme === 'dark' ? 'rgba(217, 70, 239, 0.15)' : '#FAE8FF' }]}>
-                    <FontAwesome name="clock-o" size={10} color={colors.primaryLight} style={{ marginRight: 4 }} />
-                    <Text style={[styles.availabilityText, { color: colors.primaryLight }]}>Checked Out</Text>
-                  </View>
-                )}
-                {book.copies > 0 && (
-                  <View style={[styles.availabilityBadge, { backgroundColor: colors.background, marginLeft: 8 }]}>
-                    <Text style={[styles.availabilityText, { color: colors.textSecondary }]}>{book.copies} copies</Text>
-                  </View>
-                )}
+        <View style={styles.header}>
+          <View style={styles.topBar}>
+            <View style={styles.topBarSpacer} />
+            <AppLogo size="sm" />
+            <Pressable
+              style={[styles.bellContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => setShowNotifications(true)}
+            >
+              <View style={[styles.bellGlow, { backgroundColor: colors.primary + '14' }]}>
+                <FontAwesome name="bell-o" size={17} color={colors.primary} />
               </View>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>•</Text>
+              </View>
+            </Pressable>
+          </View>
+
+          <View style={styles.greetingWrapper}>
+            <View style={styles.greetingLeft}>
+              <Text style={[styles.greetingMain, { color: colors.text }]} numberOfLines={1}>
+                {greeting}, {fullName}
+              </Text>
+              <Text style={[styles.deptText, { color: colors.textSecondary }]}>
+                {roleLabel} {departmentLabel} {sessionLabel}
+              </Text>
             </View>
           </View>
-        ))}
-      </View>
+        </View>
+
+        <LinearGradient
+          colors={[colors.primary, colors.primaryLight]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.heroCard}
+        >
+          <Text style={styles.heroQuoteTop}>Read Dream Repeat</Text>
+          <Text style={styles.heroOverline}>Today overview</Text>
+          <Text style={styles.heroTitle}>You have 2 active loans</Text>
+          <Text style={styles.heroSub}>One title is due tomorrow. Renew now to avoid late fees.</Text>
+          <View style={styles.heroMetaRow}>
+            <View style={styles.heroMetaPill}>
+              <FontAwesome name="clock-o" size={11} color="#FFF" />
+              <Text style={styles.heroMetaText}>Due in 1 day</Text>
+            </View>
+            <View style={styles.heroMetaPill}>
+              <FontAwesome name="check-circle-o" size={11} color="#FFF" />
+              <Text style={styles.heroMetaText}>No penalties</Text>
+            </View>
+          </View>
+          <FontAwesome name="graduation-cap" size={86} color="rgba(255,255,255,0.15)" style={styles.heroWatermark} />
+        </LinearGradient>
+
+        <View style={styles.metricRow}>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.primary }]}>2</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Borrowed</Text>
+          </View>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.secondary }]}>248</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Available</Text>
+          </View>
+          <View style={[styles.metricCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={[styles.metricValue, { color: colors.error }]}>1</Text>
+            <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>Due soon</Text>
+          </View>
+        </View>
+
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick actions</Text>
+        </View>
+        <View style={styles.actionGrid}>
+          {QUICK_ACTIONS.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() => router.push(item.route)}
+              style={[styles.actionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            >
+              <View style={[styles.actionIconWrap, { backgroundColor: item.accent + '1A' }]}>
+                <FontAwesome name={item.icon} size={20} color={item.accent} />
+              </View>
+              <Text style={[styles.actionTitle, { color: colors.text }]}>{item.title}</Text>
+              <Text style={[styles.actionSub, { color: colors.textSecondary }]}>{item.subtitle}</Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recently added</Text>
+          <Pressable>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.recentList}>
+          {RECENT_BOOKS.map((book) => (
+            <Pressable
+              key={book.id}
+              onPress={() =>
+                router.push({
+                  pathname: '/(student)/detail/[id]',
+                  params: {
+                    id: book.id,
+                    type: book.type,
+                    title: book.title,
+                    author: book.author,
+                    available: String(book.available ? book.copies : 0),
+                    totalCopies: String(book.totalCopies),
+                    location: book.location,
+                    description: book.description,
+                  },
+                })
+              }
+              style={[styles.bookCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            >
+              <View style={[styles.bookIconProxy, { backgroundColor: colors.background }]}>
+                <FontAwesome name="book" size={22} color={book.available ? colors.secondary : colors.primaryLight} />
+              </View>
+              <View style={styles.bookDetails}>
+                <Text style={[styles.bookTitle, { color: colors.text }]} numberOfLines={1}>
+                  {book.title}
+                </Text>
+                <Text style={[styles.bookAuthor, { color: colors.textSecondary }]}>
+                  {book.author} · {book.dept}
+                </Text>
+                <View style={styles.badgeRow}>
+                  <View
+                    style={[
+                      styles.availabilityBadge,
+                      { backgroundColor: (book.available ? colors.success : colors.error) + '1A' },
+                    ]}
+                  >
+                    <Text style={[styles.availabilityText, { color: book.available ? colors.success : colors.error }]}>
+                      {book.available ? 'Available' : 'Checked out'}
+                    </Text>
+                  </View>
+                  {book.copies > 0 ? (
+                    <View style={[styles.availabilityBadge, { backgroundColor: colors.background }]}>
+                      <Text style={[styles.availabilityText, { color: colors.textSecondary }]}>{book.copies} copies</Text>
+                    </View>
+                  ) : null}
+                </View>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      </ScrollView>
 
       <NotificationPopup visible={showNotifications} onClose={() => setShowNotifications(false)} />
-      </ScrollView>
     </View>
   );
 }
@@ -154,123 +212,161 @@ export default function StudentHomeDashboard() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 40,
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 56 : 32,
+    paddingBottom: 36,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
-    paddingBottom: 16,
-    zIndex: 10,
+    marginBottom: 18,
   },
-  greetingWrapper: { flex: 1 },
-  greetingSub: { fontSize: 12, fontWeight: 'bold', letterSpacing: 1, marginBottom: 4 },
-  greetingMain: { fontSize: 28, fontWeight: '900', marginBottom: 2 },
-  deptText: { fontSize: 14 },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  topBarSpacer: {
+    width: 48,
+    height: 48,
+  },
+  greetingWrapper: { position: 'relative', marginTop: 6, minHeight: 50, justifyContent: 'center' },
+  greetingLeft: { alignItems: 'flex-start', maxWidth: '70%' },
+  greetingMain: { fontSize: 16, fontWeight: '800', textAlign: 'left' },
+  deptText: { fontSize: 15, marginTop: 6, textAlign: 'left' },
   bellContainer: {
-    width: 48, height: 48,
-    borderRadius: 24,
-    justifyContent: 'center', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 8, elevation: 3,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  bellGlow: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badge: {
     position: 'absolute',
-    top: 10, right: 12,
+    top: 9,
+    right: 9,
     backgroundColor: '#EF4444',
-    width: 14, height: 14,
-    borderRadius: 7,
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1.5, borderColor: '#FFF'
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.2,
+    borderColor: '#FFF',
   },
-  badgeText: { color: '#FFF', fontSize: 8, fontWeight: 'bold' },
-  bannerCard: {
-    borderRadius: 20,
-    padding: 24,
-    marginBottom: 24,
+  badgeText: { color: '#FFF', fontSize: 9, fontWeight: '900', lineHeight: 10 },
+  heroCard: {
+    borderRadius: 24,
+    padding: 22,
+    marginBottom: 18,
     overflow: 'hidden',
   },
-  bannerOverline: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: 'bold', letterSpacing: 0.5, marginBottom: 8 },
-  bannerMain: { color: '#FFF', fontSize: 26, fontWeight: 'bold', marginBottom: 8 },
-  bannerSub: { color: 'rgba(255,255,255,0.9)', fontSize: 14 },
-  bannerWatermark: { position: 'absolute', right: -15, bottom: -20, transform: [{ rotate: '-15deg' }] },
-  statsRow: {
+  heroQuoteTop: { color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: '600', fontStyle: 'italic', letterSpacing: 0.3, marginBottom: 6 },
+  heroOverline: { color: 'rgba(255,255,255,0.82)', fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase' },
+  heroTitle: { color: '#FFF', fontSize: 27, fontWeight: '900', marginTop: 8, marginBottom: 8, maxWidth: '85%' },
+  heroSub: { color: 'rgba(255,255,255,0.92)', fontSize: 14, lineHeight: 21, maxWidth: '86%' },
+  heroMetaRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
+  heroMetaPill: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 32,
-    gap: 12,
-  },
-  statBox: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  statNumber: { fontSize: 24, fontWeight: '900', marginBottom: 4 },
-  statLabel: { fontSize: 11, fontWeight: 'bold', letterSpacing: 0.5 },
+  heroMetaText: { color: '#FFF', fontSize: 11, fontWeight: '700' },
+  heroWatermark: { position: 'absolute', right: -12, bottom: -16, transform: [{ rotate: '-12deg' }] },
+  metricRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 22,
+  },
+  metricCard: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  metricValue: { fontSize: 23, fontWeight: '900' },
+  metricLabel: { fontSize: 11, marginTop: 3, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 16,
-    marginTop: 8,
-  },
-  sectionTitle: { fontSize: 13, fontWeight: 'bold', letterSpacing: 1, marginBottom: 16 },
-  grid: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-    justifyContent: 'space-between',
-  },
-  gridItem: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
+    marginBottom: 12,
   },
-  iconWrapper: {
-    width: 44, height: 44,
+  sectionTitle: { fontSize: 18, fontWeight: '800' },
+  seeAllText: { fontSize: 13, fontWeight: '700' },
+  actionGrid: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  actionCard: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 14,
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 9,
+    elevation: 2,
+  },
+  actionIconWrap: {
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    justifyContent: 'center', alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  gridTitle: { fontSize: 14, fontWeight: 'bold', marginBottom: 4, textAlign: 'center' },
-  gridSub: { fontSize: 11, textAlign: 'center' },
-  recentList: {
-    gap: 12,
-  },
+  actionTitle: { fontSize: 14, fontWeight: '800' },
+  actionSub: { fontSize: 12, marginTop: 4 },
+  recentList: { gap: 10 },
   bookCard: {
     flexDirection: 'row',
-    padding: 16,
     borderRadius: 16,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    borderWidth: 1,
+    padding: 13,
     alignItems: 'center',
+    shadowColor: '#0F1A30',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   bookIconProxy: {
-    width: 50, height: 64,
-    borderRadius: 8,
-    justifyContent: 'center', alignItems: 'center',
-    marginRight: 16,
+    width: 46,
+    height: 56,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
   bookDetails: { flex: 1 },
-  bookTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
-  bookAuthor: { fontSize: 13, marginBottom: 8 },
-  badgeRow: { flexDirection: 'row', alignItems: 'center' },
+  bookTitle: { fontSize: 15, fontWeight: '800' },
+  bookAuthor: { fontSize: 12, marginTop: 4, marginBottom: 8 },
+  badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   availabilityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
+    borderRadius: 999,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 6,
   },
-  availabilityText: { fontSize: 11, fontWeight: 'bold' }
+  availabilityText: { fontSize: 11, fontWeight: '700' },
 });

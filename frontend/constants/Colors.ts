@@ -1,35 +1,35 @@
-const tintColorLight = '#7C3AED';
-const tintColorDark = '#A78BFA';
+const tintColorLight = '#2D5BFF';
+const tintColorDark = '#82A0FF';
 
 export default {
   light: {
-    primary: '#7C3AED',       // Vibrant Purple
-    primaryLight: '#D946EF',  // Bright Fuchsia (Creates a stunning gradient)
-    secondary: '#14B8A6',     // Electric Teal for beautiful contrast
-    background: '#FAFAF9',    // Warm off-white
-    surface: '#FFFFFF',       // Clean white for cards
-    text: '#1C1917',          // Deepest warm gray
-    textSecondary: '#78716C', // Soft gray for subtext
-    border: '#E7E5E4',        // Subtle borders
-    error: '#EF4444',         // Crisp Red
-    success: '#10B981',       // Mint Green
+    primary: '#2D5BFF',
+    primaryLight: '#5D8BFF',
+    secondary: '#14C7A5',
+    background: '#F4F7FF',
+    surface: '#FFFFFF',
+    text: '#121A2B',
+    textSecondary: '#6A768F',
+    border: '#DDE5F5',
+    error: '#E5484D',
+    success: '#12A972',
     tint: tintColorLight,
-    tabIconDefault: '#A8A29E',
+    tabIconDefault: '#8E98B0',
     tabIconSelected: tintColorLight,
   },
   dark: {
-    primary: '#8B5CF6',       // Brighter violet for dark mode
-    primaryLight: '#E879F9',  // Softer Fuchsia
-    secondary: '#2DD4BF',     // Bright Teal
-    background: '#1C1917',    // Deep stone background
-    surface: '#292524',       // Elevated dark surface
-    text: '#F5F5F4',          // Off-white text
-    textSecondary: '#A8A29E', // Dimmed text
-    border: '#44403C',        // Subtle dark borders
-    error: '#F87171',
-    success: '#34D399',
+    primary: '#82A0FF',
+    primaryLight: '#B0C4FF',
+    secondary: '#45E0C1',
+    background: '#0E1524',
+    surface: '#182238',
+    text: '#EFF3FF',
+    textSecondary: '#A0AECB',
+    border: '#2B3855',
+    error: '#FF757A',
+    success: '#42D39C',
     tint: tintColorDark,
-    tabIconDefault: '#78716C',
+    tabIconDefault: '#7686AB',
     tabIconSelected: tintColorDark,
   },
 };
