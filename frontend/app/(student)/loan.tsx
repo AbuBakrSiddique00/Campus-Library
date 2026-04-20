@@ -52,6 +52,7 @@ export default function LoanScreen() {
             totalCopies: String(item.totalCopies),
             location: item.location,
             description: item.description,
+            returnTo: '/(student)/loan',
           },
         })
       }

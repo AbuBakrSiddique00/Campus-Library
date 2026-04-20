@@ -10,7 +10,10 @@ const MOCK_BORROWED = [
     id: '1',
     student: 'Alice M.',
     roll: '101',
+    department: 'Computer Science',
+    session: '2023-24',
     book: 'Data Structures and Algorithms',
+    category: 'Computer Science',
     due: '2026-04-10',
     status: 'Active',
     type: 'book',
@@ -24,7 +27,10 @@ const MOCK_BORROWED = [
     id: '2',
     student: 'Bob S.',
     roll: '105',
+    department: 'Mechanical Engineering',
+    session: '2022-23',
     book: 'Operating Systems',
+    category: 'Systems',
     due: '2026-03-30',
     status: 'Overdue',
     type: 'book',
@@ -50,11 +56,40 @@ export default function BorrowedScreen() {
   });
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: '/(librarian)/loan-detail',
+          params: {
+            id: item.id,
+            student: item.student,
+            roll: item.roll,
+            department: item.department,
+            session: item.session,
+            bookTitle: item.book,
+            bookAuthor: item.author,
+            bookCategory: item.category,
+            previousLocation: item.location,
+            remainingCopies: String(item.available),
+            dueDate: item.due,
+          },
+        })
+      }
+      style={({ pressed }) => [
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          opacity: pressed ? 0.92 : 1,
+        },
+      ]}
+    >
       <View style={styles.cardHeader}>
         <View>
           <Text style={[styles.student, { color: colors.text }]}>{item.student}</Text>
           <Text style={[styles.roll, { color: colors.textSecondary }]}>Roll: {item.roll}</Text>
+          <Text style={[styles.meta, { color: colors.textSecondary }]}>Dept: {item.department}</Text>
+          <Text style={[styles.meta, { color: colors.textSecondary }]}>Session: {item.session}</Text>
         </View>
         <View style={[
           styles.badge, 
@@ -67,35 +102,20 @@ export default function BorrowedScreen() {
       </View>
       
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
-      
-      <Pressable
-        onPress={() =>
-          router.push({
-            pathname: '/(student)/detail/[id]',
-            params: {
-              id: item.id,
-              type: item.type,
-              title: item.book,
-              author: item.author,
-              available: String(item.available),
-              totalCopies: String(item.totalCopies),
-              location: item.location,
-              description: item.description,
-            },
-          })
-        }
-      >
-        <Text style={[styles.bookTitle, { color: colors.text }]}>{item.book}</Text>
-      </Pressable>
+
+      <Text style={[styles.bookTitle, { color: colors.text }]}>{item.book}</Text>
       <Text style={[styles.dueDate, { color: item.status === 'Overdue' ? colors.error : colors.textSecondary }]}>
         Due: {item.due}
       </Text>
       
-      <Pressable style={[styles.restoreBtn, { backgroundColor: colors.secondary }]}>
+      <Pressable
+        onPress={(event) => event.stopPropagation()}
+        style={[styles.restoreBtn, { backgroundColor: colors.secondary }]}
+      >
         <FontAwesome name="undo" size={16} color="#FFF" style={{ marginRight: 8 }} />
         <Text style={styles.restoreText}>Process Return</Text>
       </Pressable>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -196,6 +216,10 @@ const styles = StyleSheet.create({
   roll: {
     fontSize: 14,
     marginTop: 4,
+  },
+  meta: {
+    fontSize: 13,
+    marginTop: 2,
   },
   badge: {
     paddingHorizontal: 12,

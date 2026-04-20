@@ -1,8 +1,9 @@
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Colors from '../../constants/Colors';
 
 // Mock data for search
@@ -38,6 +39,8 @@ export default function BooksScreen() {
   const [itemType, setItemType] = useState<'book' | 'paper'>('book');
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
+  const [tag, setTag] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [shelf, setShelf] = useState('');
   const [copies, setCopies] = useState('');
   const [description, setDescription] = useState('');
@@ -50,8 +53,26 @@ export default function BooksScreen() {
 
   const handleAdd = () => {
     alert(`${itemType === 'book' ? 'Book' : 'Paper'} "${title}" added!`);
-    setTitle(''); setAuthor(''); setShelf(''); setCopies(''); setDescription('');
+    setTitle(''); setAuthor(''); setTag(''); setImageUri(null); setShelf(''); setCopies(''); setDescription('');
     setActiveTab('search');
+  };
+
+  const handlePickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access the media library is required to add an image.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets?.length) {
+      setImageUri(result.assets[0].uri);
+    }
   };
 
   const filteredBooks = MOCK_BOOKS.filter(b => 
@@ -119,6 +140,30 @@ export default function BooksScreen() {
               value={author}
               onChangeText={setAuthor}
             />
+
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Tag (Category)</Text>
+            <TextInput
+              style={[styles.input, { borderColor: colors.border, color: colors.text }]}
+              placeholder="e.g. ML, Hacking..."
+              placeholderTextColor={colors.textSecondary}
+              value={tag}
+              onChangeText={setTag}
+            />
+
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Cover Image</Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.imageButton,
+                { borderColor: colors.border, backgroundColor: pressed ? colors.background : colors.surface },
+              ]}
+              onPress={handlePickImage}
+            >
+              <FontAwesome name="image" size={18} color={colors.textSecondary} />
+              <Text style={[styles.imageButtonText, { color: colors.text }]}>{imageUri ? 'Change Image' : 'Add Image'}</Text>
+            </Pressable>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+            ) : null}
 
             <Text style={[styles.label, { color: colors.textSecondary }]}>Description</Text>
             <TextInput
@@ -198,6 +243,7 @@ export default function BooksScreen() {
                       totalCopies: String(item.totalCopies ?? item.copies),
                       location: item.location ?? item.shelf,
                       description: item.description,
+                      returnTo: '/(librarian)/add',
                     },
                   })
                 }
@@ -271,6 +317,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 20,
     fontSize: 16,
+  },
+  imageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    height: 52,
+    borderWidth: 1,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  imageButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginBottom: 20,
   },
   row: {
     flexDirection: 'row',

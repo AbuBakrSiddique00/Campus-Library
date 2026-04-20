@@ -166,6 +166,7 @@ export default function StudentHomeDashboard() {
                     totalCopies: String(book.totalCopies),
                     location: book.location,
                     description: book.description,
+                    returnTo: '/(student)',
                   },
                 })
               }

@@ -76,6 +76,7 @@ export default function SearchScreen() {
             totalCopies: String(item.totalCopies ?? item.available),
             location: item.location,
             description: item.description,
+            returnTo: '/(student)/search',
           },
         })
       }

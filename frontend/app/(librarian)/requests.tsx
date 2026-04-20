@@ -1,46 +1,111 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, Pressable } from 'react-native';
-import Colors from '../../constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import Colors from '../../constants/Colors';
 
 const MOCK_REQUESTS = [
-  { id: '1', student: 'Alice M.', roll: '101', book: 'Calculus 5th Ed', date: '2 hrs ago' },
-  { id: '2', student: 'John D.', roll: '102', book: 'Physics 101', date: '5 hrs ago' },
+  {
+    id: '1',
+    student: 'Alice M.',
+    roll: '101',
+    department: 'Computer Science',
+    session: '2023-24',
+    date: '2 hrs ago',
+    book: {
+      title: 'Calculus 5th Ed',
+      author: 'James Stewart',
+      category: 'Mathematics',
+      location: 'Shelf A - Row 2',
+      remaining: 3,
+    },
+  },
+  {
+    id: '2',
+    student: 'John D.',
+    roll: '102',
+    department: 'Physics',
+    session: '2022-23',
+    date: '5 hrs ago',
+    book: {
+      title: 'Physics 101',
+      author: 'David Halliday',
+      category: 'Science',
+      location: 'Shelf B - Row 1',
+      remaining: 1,
+    },
+  },
 ];
 
 export default function RequestsScreen() {
   const [search, setSearch] = useState('');
-  
+
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
-  const filtered = MOCK_REQUESTS.filter(r => 
-    r.student.toLowerCase().includes(search.toLowerCase()) || 
+  const filtered = MOCK_REQUESTS.filter(r =>
+    r.student.toLowerCase().includes(search.toLowerCase()) ||
     r.roll.includes(search)
   );
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+  const handleOpenRequest = (item: (typeof MOCK_REQUESTS)[number]) => {
+    router.push({
+      pathname: '/(librarian)/request-detail',
+      params: {
+        id: item.id,
+        student: item.student,
+        roll: item.roll,
+        department: item.department,
+        session: item.session,
+        bookTitle: item.book.title,
+        bookAuthor: item.book.author,
+        bookCategory: item.book.category,
+        bookLocation: item.book.location,
+        remainingCopies: String(item.book.remaining),
+      },
+    });
+  };
+
+  const renderItem = ({ item }: { item: (typeof MOCK_REQUESTS)[number] }) => (
+    <Pressable
+      onPress={() => handleOpenRequest(item)}
+      style={({ pressed }) => [
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          opacity: pressed ? 0.92 : 1,
+        },
+      ]}
+    >
       <View style={styles.cardHeader}>
-        <View>
+        <View style={styles.studentBlock}>
           <Text style={[styles.student, { color: colors.text }]}>{item.student}</Text>
           <Text style={[styles.roll, { color: colors.textSecondary }]}>Roll: {item.roll}</Text>
+          <Text style={[styles.meta, { color: colors.textSecondary }]}>Dept: {item.department}</Text>
+          <Text style={[styles.meta, { color: colors.textSecondary }]}>Session: {item.session}</Text>
         </View>
         <Text style={[styles.time, { color: colors.textSecondary }]}>{item.date}</Text>
       </View>
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
-      <Text style={[styles.bookTitle, { color: colors.text }]}>Requested: {item.book}</Text>
-      
+      <Text style={[styles.bookTitle, { color: colors.text }]}>Requested: {item.book.title}</Text>
+
       <View style={styles.actions}>
-        <Pressable style={[styles.btn, styles.rejectBtn, { borderColor: colors.error }]}>
+        <Pressable
+          onPress={(event) => event.stopPropagation()}
+          style={[styles.btn, styles.rejectBtn, { borderColor: colors.error }]}
+        >
           <Text style={[styles.btnText, { color: colors.error }]}>Reject</Text>
         </Pressable>
-        <Pressable style={[styles.btn, styles.approveBtn, { backgroundColor: colors.primary }]}>
+        <Pressable
+          onPress={(event) => event.stopPropagation()}
+          style={[styles.btn, styles.approveBtn, { backgroundColor: colors.primary }]}
+        >
           <Text style={[styles.btnText, { color: '#FFF' }]}>Approve</Text>
         </Pressable>
       </View>
-    </View>
+    </Pressable>
   );
 
   return (
@@ -102,6 +167,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 12,
   },
+  studentBlock: {
+    flex: 1,
+    paddingRight: 12,
+  },
   student: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -109,6 +178,10 @@ const styles = StyleSheet.create({
   roll: {
     fontSize: 14,
     marginTop: 4,
+  },
+  meta: {
+    fontSize: 13,
+    marginTop: 2,
   },
   time: {
     fontSize: 12,

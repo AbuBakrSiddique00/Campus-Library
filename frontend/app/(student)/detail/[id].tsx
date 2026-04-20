@@ -34,10 +34,12 @@ const getNumberParam = (value: string | string[] | undefined, fallback: number) 
 };
 
 export default function DetailScreen() {
-  const { id, title, author, available, totalCopies, location, description, type } = useLocalSearchParams();
+  const { id, title, author, available, totalCopies, location, description, type, returnTo: returnToParam } =
+    useLocalSearchParams();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const fallback = getMockData(getParam(id as string | string[] | undefined, ''));
+  const returnTo = getParam(returnToParam as string | string[] | undefined, '');
   const item = {
     id: getParam(id as string | string[] | undefined, fallback.id),
     type: getParam(type as string | string[] | undefined, fallback.type),
@@ -49,6 +51,13 @@ export default function DetailScreen() {
     description: getParam(description as string | string[] | undefined, fallback.description),
   };
   const heroIcon = item.type === 'paper' ? 'file-text-o' : 'book';
+  const handleBack = () => {
+    if (returnTo) {
+      router.replace(returnTo);
+      return;
+    }
+    router.back();
+  };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -57,7 +66,7 @@ export default function DetailScreen() {
         style={styles.imageArea}
       >
         <Pressable
-          onPress={() => router.back()}
+          onPress={handleBack}
           style={styles.backButton}
           accessibilityRole="button"
           accessibilityLabel="Go back"

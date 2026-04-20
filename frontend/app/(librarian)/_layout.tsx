@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Tabs } from 'expo-router';
-import Colors from '../../constants/Colors';
+import AppLogo from '@/components/AppLogo';
 import { useColorScheme } from '@/components/useColorScheme';
-import { router } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { router, Tabs } from 'expo-router';
+import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import NotificationPopup from '../../components/NotificationPopup';
-import AppLogo from '@/components/AppLogo';
+import Colors from '../../constants/Colors';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -109,6 +108,14 @@ export default function LibrarianTabLayout() {
         }}
       />
       <Tabs.Screen
+        name="request-detail"
+        options={{
+          href: null,
+          title: 'Request Details',
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="borrowed"
         options={{
           title: 'Loans',
@@ -118,6 +125,14 @@ export default function LibrarianTabLayout() {
               <FontAwesome name="arrow-left" size={20} color={themeColors.primary} />
             </Pressable>
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="loan-detail"
+        options={{
+          href: null,
+          title: 'Loan Details',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
