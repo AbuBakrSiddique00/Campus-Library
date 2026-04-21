@@ -17,6 +17,8 @@ const getMockData = (id: string) => {
     bookCategory: 'Category',
     bookLocation: 'Shelf - Row',
     remainingCopies: 0,
+    reservationDate: '',
+    returnDate: '2026-04-10',
   };
 };
 
@@ -33,6 +35,22 @@ const getNumberParam = (value: string | string[] | undefined, fallback: number) 
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const parseDateLocal = (value: string) => {
+  const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/;
+  if (isoDateOnly.test(value)) {
+    const [y, m, d] = value.split('-').map(Number);
+    return new Date(y!, (m ?? 1) - 1, d);
+  }
+  return new Date(value);
+};
+
+const formatDate = (value: string) => {
+  if (!value) return '—';
+  const date = parseDateLocal(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+};
+
 export default function RequestDetailScreen() {
   const {
     id,
@@ -45,6 +63,8 @@ export default function RequestDetailScreen() {
     bookCategory,
     bookLocation,
     remainingCopies,
+    reservationDate,
+    returnDate,
   } = useLocalSearchParams();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
@@ -60,6 +80,8 @@ export default function RequestDetailScreen() {
     bookCategory: getParam(bookCategory as string | string[] | undefined, fallback.bookCategory),
     bookLocation: getParam(bookLocation as string | string[] | undefined, fallback.bookLocation),
     remainingCopies: getNumberParam(remainingCopies as string | string[] | undefined, fallback.remainingCopies),
+    reservationDate: getParam(reservationDate as string | string[] | undefined, fallback.reservationDate),
+    returnDate: getParam(returnDate as string | string[] | undefined, fallback.returnDate),
   };
 
   return (
@@ -118,6 +140,16 @@ export default function RequestDetailScreen() {
         <View style={styles.infoRow}>
           <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Remaining Copies</Text>
           <Text style={[styles.infoValue, { color: colors.text }]}>{details.remainingCopies}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Reservation Date</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>
+            {details.reservationDate ? formatDate(details.reservationDate) : 'Not approved yet'}
+          </Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Return Date</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>{formatDate(details.returnDate)}</Text>
         </View>
       </View>
 

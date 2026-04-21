@@ -17,7 +17,8 @@ const getMockData = (id: string) => {
     bookCategory: 'Category',
     previousLocation: 'Shelf - Row',
     remainingCopies: 0,
-    dueDate: '2026-04-10',
+    reservationDate: '2026-04-01',
+    returnDate: '2026-04-10',
   };
 };
 
@@ -34,6 +35,22 @@ const getNumberParam = (value: string | string[] | undefined, fallback: number) 
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const parseDateLocal = (value: string) => {
+  const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/;
+  if (isoDateOnly.test(value)) {
+    const [y, m, d] = value.split('-').map(Number);
+    return new Date(y!, (m ?? 1) - 1, d);
+  }
+  return new Date(value);
+};
+
+const formatDate = (value: string) => {
+  if (!value) return '—';
+  const date = parseDateLocal(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' });
+};
+
 export default function LoanDetailScreen() {
   const {
     id,
@@ -46,6 +63,8 @@ export default function LoanDetailScreen() {
     bookCategory,
     previousLocation,
     remainingCopies,
+    reservationDate,
+    returnDate,
     dueDate,
   } = useLocalSearchParams();
   const colorScheme = useColorScheme() ?? 'light';
@@ -62,7 +81,11 @@ export default function LoanDetailScreen() {
     bookCategory: getParam(bookCategory as string | string[] | undefined, fallback.bookCategory),
     previousLocation: getParam(previousLocation as string | string[] | undefined, fallback.previousLocation),
     remainingCopies: getNumberParam(remainingCopies as string | string[] | undefined, fallback.remainingCopies),
-    dueDate: getParam(dueDate as string | string[] | undefined, fallback.dueDate),
+    reservationDate: getParam(reservationDate as string | string[] | undefined, fallback.reservationDate),
+    returnDate: getParam(
+      returnDate as string | string[] | undefined,
+      getParam(dueDate as string | string[] | undefined, fallback.returnDate)
+    ),
   };
 
   return (
@@ -123,8 +146,12 @@ export default function LoanDetailScreen() {
           <Text style={[styles.infoValue, { color: colors.text }]}>{details.remainingCopies}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Due Date</Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>{details.dueDate}</Text>
+          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Reservation Date</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>{formatDate(details.reservationDate)}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Return Date</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>{formatDate(details.returnDate)}</Text>
         </View>
       </View>
 

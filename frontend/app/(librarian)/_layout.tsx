@@ -136,6 +136,14 @@ export default function LibrarianTabLayout() {
         }}
       />
       <Tabs.Screen
+        name="book-detail/[id]"
+        options={{
+          href: null,
+          title: 'Book Details',
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

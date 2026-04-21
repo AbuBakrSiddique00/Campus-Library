@@ -1,7 +1,7 @@
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Colors from '../../constants/Colors';
 
@@ -13,6 +13,7 @@ const MOCK_REQUESTS = [
     department: 'Computer Science',
     session: '2023-24',
     date: '2 hrs ago',
+    returnDate: '2026-04-10',
     book: {
       title: 'Calculus 5th Ed',
       author: 'James Stewart',
@@ -28,6 +29,7 @@ const MOCK_REQUESTS = [
     department: 'Physics',
     session: '2022-23',
     date: '5 hrs ago',
+    returnDate: '2026-04-08',
     book: {
       title: 'Physics 101',
       author: 'David Halliday',
@@ -63,6 +65,7 @@ export default function RequestsScreen() {
         bookCategory: item.book.category,
         bookLocation: item.book.location,
         remainingCopies: String(item.book.remaining),
+        returnDate: item.returnDate,
       },
     });
   };

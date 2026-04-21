@@ -14,6 +14,8 @@ const MOCK_DATA = [
     author: 'James Stewart',
     available: 3,
     totalCopies: 5,
+    libraryName: 'Main Library',
+    tag: 'Mathematics',
     location: 'Shelf A - Row 2',
     description: 'A rigorous introduction to calculus for engineering and mathematics coursework.',
   },
@@ -24,6 +26,8 @@ const MOCK_DATA = [
     author: 'Thomas H. Cormen',
     available: 1,
     totalCopies: 4,
+    libraryName: 'CSE Library',
+    tag: 'Algorithms',
     location: 'Shelf C - Row 1',
     description: 'Classic reference on algorithm design, analysis, and core data structures.',
   },
@@ -34,6 +38,8 @@ const MOCK_DATA = [
     author: 'Dr. Alan Turing',
     available: 5,
     totalCopies: 5,
+    libraryName: 'Seminar Library',
+    tag: 'AI',
     location: 'Digital / Sem Library',
     description: 'Survey of modern deep learning techniques applied to vision tasks.',
   },
@@ -44,6 +50,8 @@ const MOCK_DATA = [
     author: 'Abraham Silberschatz',
     available: 0,
     totalCopies: 3,
+    libraryName: 'Main Library',
+    tag: 'Operating Systems',
     location: 'Shelf B - Row 4',
     description: 'Comprehensive overview of OS fundamentals: processes, memory, and storage.',
   },
@@ -56,10 +64,17 @@ export default function SearchScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
-  const filteredData = MOCK_DATA.filter((item) => 
-    item.type === activeTab && 
-    item.title.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredData = MOCK_DATA.filter((item) => {
+    if (item.type !== activeTab) return false;
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+
+    const titleMatch = item.title.toLowerCase().includes(q);
+    const authorMatch = item.author.toLowerCase().includes(q);
+    const tagMatch = (item.tag ?? '').toLowerCase().includes(q);
+
+    return titleMatch || authorMatch || tagMatch;
+  });
 
   const renderItem = ({ item }: { item: any }) => (
     <Pressable 
@@ -76,6 +91,8 @@ export default function SearchScreen() {
             totalCopies: String(item.totalCopies ?? item.available),
             location: item.location,
             description: item.description,
+            libraryName: item.libraryName ?? '',
+            tag: item.tag ?? '',
             returnTo: '/(student)/search',
           },
         })
@@ -87,6 +104,11 @@ export default function SearchScreen() {
       <View style={styles.cardContent}>
         <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
         <Text style={[styles.cardAuthor, { color: colors.textSecondary }]}>{item.author}</Text>
+        {item.tag ? (
+          <Text style={[styles.cardTag, { color: colors.textSecondary }]} numberOfLines={1}>
+            Tag: {item.tag}
+          </Text>
+        ) : null}
         <View style={styles.badgeContainer}>
           <View style={[styles.badge, { backgroundColor: item.available > 0 ? colors.success + '20' : colors.error + '20' }]}>
             <Text style={[styles.badgeText, { color: item.available > 0 ? colors.success : colors.error }]}>
@@ -106,7 +128,7 @@ export default function SearchScreen() {
           <FontAwesome name="search" size={20} color={colors.textSecondary} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Search title, author..."
+            placeholder="Search title, author, or tag..."
             placeholderTextColor={colors.textSecondary}
             value={query}
             onChangeText={setQuery}
@@ -209,7 +231,12 @@ const styles = StyleSheet.create({
   },
   cardAuthor: {
     fontSize: 14,
-    marginBottom: 12,
+    marginBottom: 6,
+  },
+  cardTag: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 10,
   },
   badgeContainer: {
     flexDirection: 'row',

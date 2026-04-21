@@ -3,89 +3,81 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
 import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useLoans } from '@/contexts/LoanContext';
 import Colors from '../../constants/Colors';
 
-const MOCK_LOANS = [
-  {
-    id: '1',
-    title: 'Data Structures and Algorithms',
-    borrowDate: '2026-04-01',
-    returnDate: '2026-04-10',
-    status: 'Active',
-    type: 'book',
-    author: 'Thomas H. Cormen',
-    available: 1,
-    totalCopies: 4,
-    location: 'Shelf C - Row 1',
-    description: 'Classic reference on algorithm design, analysis, and core data structures.',
-  },
-  {
-    id: '2',
-    title: 'Introduction to Mechanics',
-    borrowDate: '2026-03-15',
-    returnDate: '2026-03-30',
-    status: 'Overdue',
-    type: 'book',
-    author: 'Kleppner & Kolenkow',
-    available: 0,
-    totalCopies: 3,
-    location: 'Shelf D - Row 2',
-    description: 'Mechanics fundamentals with rigorous problem-based explanations.',
-  },
-];
+const getStatusColors = (status: string, colors: (typeof Colors)[keyof typeof Colors]) => {
+  if (status === 'Overdue') return { bg: colors.error + '20', fg: colors.error };
+  if (status === 'Pending') return { bg: colors.primary + '18', fg: colors.primary };
+  return { bg: colors.success + '20', fg: colors.success };
+};
 
 export default function LoanScreen() {
+  const { loans, message, clearMessage } = useLoans();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
 
-  const renderItem = ({ item }: { item: any }) => (
-    <Pressable
-      onPress={() =>
-        router.push({
-          pathname: '/(student)/detail/[id]',
-          params: {
-            id: item.id,
-            type: item.type,
-            title: item.title,
-            author: item.author,
-            available: String(item.available),
-            totalCopies: String(item.totalCopies),
-            location: item.location,
-            description: item.description,
-            returnTo: '/(student)/loan',
-          },
-        })
-      }
-      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
-    >
-      <View style={styles.cardHeader}>
-        <FontAwesome name="book" size={24} color={colors.primary} />
-        <View style={[
-          styles.badge, 
-          { backgroundColor: item.status === 'Overdue' ? colors.error + '20' : colors.success + '20' }
-        ]}>
-          <Text style={{ color: item.status === 'Overdue' ? colors.error : colors.success, ...styles.badgeText }}>
-            {item.status}
-          </Text>
+  const renderItem = ({ item }: { item: (typeof loans)[number] }) => {
+    const badge = getStatusColors(item.status, colors);
+    return (
+      <Pressable
+        onPress={() =>
+          router.push({
+            pathname: '/(student)/detail/[id]',
+            params: {
+              id: item.id,
+              type: item.type,
+              title: item.title,
+              author: item.author,
+              available: String(item.available),
+              totalCopies: String(item.totalCopies),
+              location: item.location,
+              description: item.description,
+              libraryName: item.libraryName ?? '',
+              tag: item.tag ?? '',
+              borrowDate: item.borrowDate,
+              returnDate: item.returnDate,
+              status: item.status,
+              mode: 'loan',
+              returnTo: '/(student)/loan',
+            },
+          })
+        }
+        style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      >
+        <View style={styles.cardHeader}>
+          <FontAwesome name="book" size={24} color={colors.primary} />
+          <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+            <Text style={{ color: badge.fg, ...styles.badgeText }}>{item.status}</Text>
+          </View>
         </View>
-      </View>
-      
-      <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-      
-      <View style={styles.dateRow}>
-        <Text style={[styles.dateText, { color: colors.textSecondary }]}>Borrowed: {item.borrowDate}</Text>
-        <Text style={[styles.dateText, { color: item.status === 'Overdue' ? colors.error : colors.text }]}>
-          Due: {item.returnDate}
+
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
+          {item.title}
         </Text>
-      </View>
-    </Pressable>
-  );
+
+        <View style={styles.dateRow}>
+          <Text style={[styles.dateText, { color: colors.textSecondary }]}>Borrowed: {item.borrowDate}</Text>
+          <Text style={[styles.dateText, { color: item.status === 'Overdue' ? colors.error : colors.text }]}>Due: {item.returnDate}</Text>
+        </View>
+      </Pressable>
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {message ? (
+        <View style={[styles.banner, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[styles.bannerText, { color: colors.text }]}>{message}</Text>
+          <Pressable onPress={clearMessage} style={styles.bannerClose}>
+            <FontAwesome name="times" size={16} color={colors.textSecondary} />
+          </Pressable>
+        </View>
+      ) : null}
+
       <FlatList
-        data={MOCK_LOANS}
-        keyExtractor={item => item.id}
+        data={loans}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
@@ -98,7 +90,30 @@ export default function LoanScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  listContainer: { padding: 16 },
+  banner: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  bannerText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  bannerClose: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listContainer: { padding: 16, paddingTop: 12 },
   card: {
     padding: 16,
     borderRadius: 16,

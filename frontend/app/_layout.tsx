@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import { AuthProvider } from '../contexts/AuthContext';
+import { LoanProvider } from '../contexts/LoanContext';
 import Colors from '../constants/Colors';
 
 export {
@@ -60,12 +61,14 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={customTheme}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(student)" />
-          <Stack.Screen name="(librarian)" />
-        </Stack>
+        <LoanProvider>
+          <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(student)" />
+            <Stack.Screen name="(librarian)" />
+          </Stack>
+        </LoanProvider>
       </AuthProvider>
     </ThemeProvider>
   );

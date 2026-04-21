@@ -1,10 +1,10 @@
+import AppLogo from '@/components/AppLogo';
 import { useColorScheme } from '@/components/useColorScheme';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import AppLogo from '@/components/AppLogo';
 import Colors from '../../constants/Colors';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
     padding: 22,
     borderRadius: 26,
     borderWidth: 1,
-    backdropFilter: 'blur(6px)',
     shadowColor: '#1A2B54',
     shadowOffset: { width: 0, height: 14 },
     shadowOpacity: 0.14,

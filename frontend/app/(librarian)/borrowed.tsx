@@ -1,7 +1,7 @@
 import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import Colors from '../../constants/Colors';
 
@@ -14,6 +14,7 @@ const MOCK_BORROWED = [
     session: '2023-24',
     book: 'Data Structures and Algorithms',
     category: 'Computer Science',
+    reservationDate: '2026-04-01',
     due: '2026-04-10',
     status: 'Active',
     type: 'book',
@@ -31,6 +32,7 @@ const MOCK_BORROWED = [
     session: '2022-23',
     book: 'Operating Systems',
     category: 'Systems',
+    reservationDate: '2026-03-15',
     due: '2026-03-30',
     status: 'Overdue',
     type: 'book',
@@ -71,6 +73,8 @@ export default function BorrowedScreen() {
             bookCategory: item.category,
             previousLocation: item.location,
             remainingCopies: String(item.available),
+            reservationDate: item.reservationDate,
+            returnDate: item.due,
             dueDate: item.due,
           },
         })

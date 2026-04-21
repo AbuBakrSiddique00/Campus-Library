@@ -2,7 +2,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FlatList, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Colors from '../../constants/Colors';
 
@@ -233,7 +233,7 @@ export default function BooksScreen() {
               <Pressable
                 onPress={() =>
                   router.push({
-                    pathname: '/(student)/detail/[id]',
+                    pathname: '/(librarian)/book-detail/[id]',
                     params: {
                       id: item.id,
                       type: item.type,
@@ -242,6 +242,7 @@ export default function BooksScreen() {
                       available: String(item.copies),
                       totalCopies: String(item.totalCopies ?? item.copies),
                       location: item.location ?? item.shelf,
+                      shelf: item.shelf,
                       description: item.description,
                       returnTo: '/(librarian)/add',
                     },
