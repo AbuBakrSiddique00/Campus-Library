@@ -144,7 +144,7 @@ export default function BooksScreen() {
             <Text style={[styles.label, { color: colors.textSecondary }]}>Tag (Category)</Text>
             <TextInput
               style={[styles.input, { borderColor: colors.border, color: colors.text }]}
-              placeholder="e.g. ML, Hacking..."
+              placeholder="e.g. ML, Hacking...Reservation Date"
               placeholderTextColor={colors.textSecondary}
               value={tag}
               onChangeText={setTag}
